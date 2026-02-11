@@ -1,4 +1,4 @@
-# Fields – Advanced YForm Field Types for REDAXO
+# Fields – Advanced editorial YForm Field Types for REDAXO
 
 ![REDAXO](https://img.shields.io/badge/REDAXO-%3E%3D5.17-red) ![YForm](https://img.shields.io/badge/YForm-%3E%3D4.0-blue) ![PHP](https://img.shields.io/badge/PHP-%3E%3D8.1-purple)
 
