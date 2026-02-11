@@ -20,7 +20,7 @@ requires:
     php:
         version: '>=8.1'
     packages:
-        yform: '^5.0'
+        yform: '>=4.0'
 
 default_config:
     # Social-Web-Repeater
