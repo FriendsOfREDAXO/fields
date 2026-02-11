@@ -1,0 +1,139 @@
+fields_title = Fields
+fields_config = Einstellungen
+fields_info = Info & Hilfe
+
+# Social Web Repeater
+fields_social_web = Social Web
+fields_social_web_description = Social-Media-Profile verwalten
+fields_social_web_platform = Plattform
+fields_social_web_url = URL / Benutzername
+fields_social_web_add = Profil hinzufügen
+fields_social_web_remove = Profil entfernen
+fields_social_web_icon_set = Icon-Set
+fields_social_web_icon_set_notice = Font Awesome oder UIkit Icons für die Darstellung
+
+# Opening Hours
+fields_opening_hours = Öffnungszeiten
+fields_opening_hours_description = Öffnungszeiten mit Sonderzeiten verwalten
+fields_opening_hours_regular = Reguläre Öffnungszeiten
+fields_opening_hours_special = Sonderöffnungszeiten
+fields_opening_hours_note = Hinweis
+fields_opening_hours_note_placeholder = z.B. Weitere Termine nach Absprache
+fields_opening_hours_status_open = Geöffnet
+fields_opening_hours_status_closed = Geschlossen
+fields_opening_hours_status_24h = 24 Stunden
+fields_opening_hours_add_time = Zeitslot hinzufügen
+fields_opening_hours_add_special = Sonderzeit hinzufügen
+fields_opening_hours_special_date = Datum
+fields_opening_hours_special_name = Bezeichnung
+fields_opening_hours_special_holiday = Feiertag
+fields_opening_hours_monday = Montag
+fields_opening_hours_tuesday = Dienstag
+fields_opening_hours_wednesday = Mittwoch
+fields_opening_hours_thursday = Donnerstag
+fields_opening_hours_friday = Freitag
+fields_opening_hours_saturday = Samstag
+fields_opening_hours_sunday = Sonntag
+
+# Contacts
+fields_contacts = Kontakte
+fields_contacts_description = Kontakt-/Profildaten erfassen
+fields_contacts_avatar = Avatar / Foto
+fields_contacts_company_logo = Firmenlogo
+fields_contacts_company = Firma
+fields_contacts_firstname = Vorname
+fields_contacts_lastname = Nachname
+fields_contacts_function = Funktion / Position
+fields_contacts_phone = Telefon
+fields_contacts_mobile = Mobil
+fields_contacts_email = E-Mail
+fields_contacts_address = Anschrift
+fields_contacts_address_street = Straße
+fields_contacts_address_zip = PLZ
+fields_contacts_address_city = Ort
+fields_contacts_address_country = Land
+fields_contacts_social = Social Media
+fields_contacts_homepage = Homepage
+fields_contacts_add = Kontakt hinzufügen
+fields_contacts_remove = Kontakt entfernen
+fields_contacts_optional_fields = Optionale Felder
+fields_contacts_optional_fields_notice = Kommasepariert: avatar, company_logo, company, function, phone, mobile, email, address, social, homepage – leer oder "all" = alle Felder aktiv
+fields_contacts_avatar_ratio = Avatar-Seitenverhältnis
+fields_contacts_avatar_ratio_notice = Seitenverhältnis für den Bildausschnitt (Crop)
+fields_contacts_media_category = Medienkategorie
+fields_contacts_media_category_notice = Medienkategorie-ID für die Medienpool-Auswahl (0 = alle)
+fields_contacts_media_select = Medienpool öffnen
+fields_contacts_crop = Bildausschnitt wählen
+fields_contacts_media_crop = Bildausschnitt wählen
+fields_contacts_media_remove = Bild entfernen
+fields_contacts_ratio_free = Frei
+fields_contacts_ratio_1_1 = 1:1 (Quadrat)
+fields_contacts_ratio_4_3 = 4:3 (Querformat)
+fields_contacts_ratio_3_4 = 3:4 (Hochformat)
+fields_contacts_ratio_16_9 = 16:9 (Breitbild)
+fields_contacts_ratio_3_2 = 3:2
+fields_contacts_ratio_2_3 = 2:3
+
+# IBAN
+fields_iban = IBAN-Prüfung
+fields_iban_description = IBAN-Nummer mit Live-Validierung
+fields_iban_placeholder = DE89 3704 0044 0532 0130 00
+fields_iban_valid = IBAN gültig
+fields_iban_invalid = IBAN ungültig
+fields_iban_checking = Wird geprüft...
+fields_iban_bank = Bank
+fields_iban_bic = BIC
+fields_iban_proxy_enabled = IBAN-Proxy aktiviert
+fields_iban_proxy_notice = Die Validierung wird über den eigenen Server als Proxy durchgeführt
+
+# FAQ Repeater
+fields_faq = FAQ
+fields_faq_description = Fragen und Antworten mit Schema.org Unterstützung
+fields_faq_question = Frage
+fields_faq_answer = Antwort
+fields_faq_add = Frage hinzufügen
+fields_faq_remove = Frage entfernen
+fields_faq_schema = Schema.org JSON-LD ausgeben
+
+# QR Code
+fields_qrcode = QR-Code
+fields_qrcode_description = QR-Code aus Text/URL generieren
+fields_qrcode_content = Inhalt (URL/Text)
+fields_qrcode_size = Größe (px)
+fields_qrcode_color = Vordergrundfarbe
+fields_qrcode_bg = Hintergrundfarbe
+fields_qrcode_preview = Vorschau
+fields_qrcode_download = QR-Code herunterladen
+
+# Conditional Field Group
+fields_conditional = Bedingtes Feld
+fields_conditional_description = Felder abhängig von anderen Feldern ein-/ausblenden
+fields_conditional_source = Quellfeld
+fields_conditional_operator = Operator
+fields_conditional_value = Wert
+fields_conditional_action = Aktion
+fields_conditional_show = Anzeigen
+fields_conditional_hide = Ausblenden
+
+# Icon Picker
+fields_icon_picker = Icon-Auswahl
+fields_icon_picker_description = Icons aus Font Awesome oder UIkit auswählen
+fields_icon_picker_search = Icon suchen...
+fields_icon_picker_fontawesome = Font Awesome
+fields_icon_picker_uikit = UIkit
+fields_icon_picker_no_results = Keine Icons gefunden
+fields_icon_picker_selected = Ausgewähltes Icon
+fields_icon_picker_clear = Auswahl entfernen
+
+# Config
+fields_config_iban = IBAN-Einstellungen
+fields_config_icon_picker = Icon-Picker-Einstellungen
+fields_config_icon_sets = Verfügbare Icon-Sets
+fields_config_icon_sets_notice = Kommagetrennt: fontawesome, uikit
+fields_config_qrcode = QR-Code-Einstellungen
+fields_config_saved = Einstellungen gespeichert
+
+fields_config_icons_fa = Font Awesome Icons
+fields_config_icons_fa_notice = Kommaseparierte Liste der verfügbaren Icons (z.B. fa-home, fa-user). Leer lassen für Standard.
+fields_config_icons_uikit = UIkit Icons
+fields_config_icons_uikit_notice = Kommaseparierte Liste der verfügbaren Icons (z.B. home, user). Leer lassen für Standard.

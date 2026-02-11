@@ -1,0 +1,38 @@
+package: fields
+version: '1.0.0'
+author: 'Friends Of REDAXO'
+supportpage: https://github.com/FriendsOfREDAXO/fields
+
+page:
+    title: 'translate:fields_title'
+    perm: fields[]
+    icon: rex-icon fa-puzzle-piece
+    subpages:
+        config:
+            title: 'translate:fields_config'
+            icon: rex-icon fa-cogs
+        info:
+            title: 'translate:fields_info'
+            icon: rex-icon fa-info-circle
+
+requires:
+    redaxo: '^5.17'
+    php:
+        version: '>=8.1'
+    packages:
+        yform: '^5.0'
+
+default_config:
+    # Social-Web-Repeater
+    social_web_icon_set: 'fontawesome'
+
+    # IBAN
+    iban_proxy_enabled: true
+
+    # QR Code
+    qr_default_size: 200
+    qr_default_color: '#000000'
+    qr_default_bg: '#ffffff'
+
+    # Icon Picker
+    icon_sets: 'fontawesome,uikit'

@@ -1,0 +1,256 @@
+/**
+ * Fields Addon - Backend Styles
+ */
+
+/* ============================================================
+   Repeater (shared)
+   ============================================================ */
+
+.fields-repeater-entries .fields-repeater-entry {
+    margin-bottom: 8px;
+}
+
+.fields-repeater-entries .fields-repeater-entry .panel-body {
+    padding: 10px 15px;
+}
+
+.fields-repeater-entries .fields-repeater-entry .panel-heading {
+    padding: 6px 15px;
+}
+
+.fields-repeater-add {
+    margin-top: 5px;
+}
+
+/* ============================================================
+   Social Web
+   ============================================================ */
+
+.fields-social-web-repeater .row {
+    display: flex;
+    align-items: center;
+}
+
+/* ============================================================
+   Opening Hours
+   ============================================================ */
+
+.fields-oh-table td {
+    vertical-align: middle !important;
+}
+
+.fields-oh-timeslot {
+    margin-bottom: 5px;
+}
+
+.fields-oh-timeslot .form-inline {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.fields-oh-timeslot .form-inline span {
+    padding: 0 3px;
+}
+
+.fields-oh-add-time {
+    margin-top: 5px;
+}
+
+.fields-oh-special-entry {
+    margin-bottom: 5px;
+}
+
+/* ============================================================
+   Contacts
+   ============================================================ */
+
+/* Repeater heading layout */
+.fields-repeater-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.fields-repeater-heading .btn {
+    flex-shrink: 0;
+    margin-left: 10px;
+}
+
+.fields-contact-social-entry {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Media Pool Field */
+.fields-media-field {
+    margin-bottom: 8px;
+}
+
+.fields-media-field .input-group {
+    width: 100%;
+}
+
+.fields-media-field .fields-media-input {
+    background-color: #fff;
+}
+
+.fields-media-preview {
+    margin-top: 5px;
+}
+
+.fields-media-preview img {
+    max-height: 80px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 2px;
+    background: #fff;
+}
+
+/* Crop Overlay / Modal */
+.fields-crop-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 10100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fields-crop-modal {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+    max-width: 620px;
+    width: 90%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.fields-crop-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.fields-crop-header h4 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.fields-crop-header .close {
+    font-size: 22px;
+    line-height: 1;
+    opacity: 0.6;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.fields-crop-header .close:hover {
+    opacity: 1;
+}
+
+.fields-crop-body {
+    padding: 16px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fields-crop-container {
+    width: 100%;
+}
+
+.fields-crop-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid #e5e5e5;
+}
+
+.fields-crop-footer .fields-crop-reset {
+    margin-right: auto;
+}
+
+/* ============================================================
+   IBAN
+   ============================================================ */
+
+.fields-iban-wrapper .input-group-addon {
+    min-width: 40px;
+    text-align: center;
+}
+
+.fields-iban-result {
+    padding: 4px 0;
+    color: #555;
+}
+
+/* ============================================================
+   QR Code
+   ============================================================ */
+
+.fields-qrcode-preview {
+    background: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fields-qrcode-preview img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ============================================================
+   Icon Picker
+   ============================================================ */
+
+.fields-icon-picker .fields-icon-preview {
+    min-width: 40px;
+    text-align: center;
+    font-size: 18px;
+}
+
+.fields-icon-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+
+.fields-icon-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.fields-icon-item:hover {
+    background-color: #e8e8e8;
+    border-color: #999;
+}
+
+/* ============================================================
+   Conditional Fields (hidden rule marker)
+   ============================================================ */
+
+.fields-conditional-rule {
+    display: none !important;
+    height: 0;
+    overflow: hidden;
+}
