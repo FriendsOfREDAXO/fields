@@ -107,4 +107,54 @@ class rex_yform_value_fields_social_web extends rex_yform_value_abstract
             'famous' => false,
         ];
     }
+
+    public static function getListValue(array $params)
+    {
+        $value = $params['value'];
+        if (!$value) return '-';
+        
+        $entries = json_decode($value, true);
+        if (!$entries || !is_array($entries)) return '-';
+        
+        $count = count($entries);
+        if ($count === 0) return '-';
+        
+        $maxShow = 5;
+        $idx = 0;
+        $out = '';
+        
+        // Use reflection or hardcoded map if we can't access private const easily in older PHP versions, 
+        // but self::PLATFORMS works fine in 7.1+ inside the class.
+        // To be safe and simple, we check availability.
+        
+        foreach ($entries as $item) {
+            if ($idx >= $maxShow) break;
+            
+            $platformKey = $item['platform'] ?? 'custom';
+            $url = $item['url'] ?? '';
+            
+            if (!$url) continue;
+            
+            // Icon Lookup
+            $icon = 'fa-globe';
+            $label = $platformKey;
+            
+            if (isset(self::PLATFORMS[$platformKey])) {
+                $icon = self::PLATFORMS[$platformKey]['fa'];
+                $label = self::PLATFORMS[$platformKey]['label'];
+            }
+            
+            $out .= '<a href="'.rex_escape($url).'" title="'.rex_escape($label).': '.rex_escape($url).'" target="_blank" rel="noreferrer noopener" onclick="event.stopPropagation();" style="text-decoration:none; margin-right:5px; font-size:14px; color:#555;">';
+            $out .= '<i class="rex-icon '.rex_escape($icon).'"></i>';
+            $out .= '</a>';
+            
+            $idx++;
+        }
+        
+        if ($count > $maxShow) {
+            $out .= '<span class="text-muted" style="font-size:11px; vertical-align:text-bottom;">(+' . ($count - $maxShow) . ')</span>';
+        }
+        
+        return $out;
+    }
 }

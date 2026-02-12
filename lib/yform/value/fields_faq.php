@@ -106,4 +106,18 @@ class rex_yform_value_fields_faq extends rex_yform_value_abstract
             'famous' => false,
         ];
     }
+    
+    public static function getListValue(array $params)
+    {
+        $value = $params['value'];
+        if (!$value) return '-';
+        
+        $entries = json_decode($value, true);
+        if (!$entries || !is_array($entries)) return '-';
+        
+        $count = count($entries);
+        if ($count === 0) return '-';
+        
+        return $count . ' ' . rex_i18n::msg('fields_faq_entries_label', 'Fragen');
+    }
 }

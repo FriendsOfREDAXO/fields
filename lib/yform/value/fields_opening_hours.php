@@ -102,4 +102,52 @@ class rex_yform_value_fields_opening_hours extends rex_yform_value_abstract
             'famous' => false,
         ];
     }
+    
+    public static function getListValue(array $params)
+    {
+        $value = $params['value'];
+        if (!$value) return '-';
+
+        $data = json_decode($value, true);
+        if (!$data || !is_array($data)) return '-';
+        
+        $regular = $data['regular'] ?? [];
+        $special = $data['special'] ?? [];
+        
+        // Count open days
+        $openDays = [];
+        $mapping = [
+            'monday' => 'Mo', 'tuesday' => 'Di', 'wednesday' => 'Mi', 
+            'thursday' => 'Do', 'friday' => 'Fr', 'saturday' => 'Sa', 'sunday' => 'So'
+        ];
+        
+        foreach($mapping as $en => $de) {
+            if (isset($regular[$en]) && ($regular[$en]['status'] ?? '') === 'open') {
+                $times = $regular[$en]['times'] ?? [];
+                if (!empty($times)) $openDays[] = $de;
+            }
+        }
+        
+        $out = '';
+        if ($openDays) {
+            $count = count($openDays);
+            if ($count <= 3) {
+                 $out .= '<span class="label label-success">' . implode(', ', $openDays) . '</span>';
+            } elseif ($count === 7) {
+                 $out .= '<span class="label label-success">Täglich</span>';
+            } elseif ($count === 5 && in_array('Mo', $openDays) && in_array('Fr', $openDays)) {
+                 $out .= '<span class="label label-success">Mo-Fr</span>';
+            } else {
+                 $out .= '<span class="label label-success">' . $count . ' Tage</span>';
+            }
+        } else {
+             $out .= '<span class="label label-default">Geschlossen</span>';
+        }
+        
+        if (!empty($special)) {
+            $out .= ' <span class="label label-info" title="Sonderöffnungszeiten">+' . count($special) . ' Sonder</span>';
+        }
+        
+        return $out;
+    }
 }

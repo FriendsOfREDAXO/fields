@@ -52,7 +52,10 @@
                 state.rows.forEach(function(r) { r.push(''); });
             }
 
-            // Sync initial enforcement to Hidden Input
+            // Sync initial enforcement and migrations to Hidden Input
+            state.cols.forEach(function(c) {
+                if(!c.header_type) c.header_type = c.type || 'text';
+            });
             updateHidden();
 
             function render() {
@@ -81,45 +84,70 @@
                     th.className = 'text-center';
                     th.style.padding = '5px';
                     
-                    // Column Type Toggle (Text/Center/Number)
+                    var colWrapper = document.createElement('div');
+                    colWrapper.style.display = 'flex';
+                    colWrapper.style.justifyContent = 'center';
+                    colWrapper.style.alignItems = 'center';
+                    colWrapper.style.gap = '2px';
+
+                    // --- Header Align Button ---            
+                    var headerTypeBtn = document.createElement('button');
+                    headerTypeBtn.type = 'button';
+                    headerTypeBtn.className = 'btn btn-default btn-xs fields-table-header-type';
+                    headerTypeBtn.dataset.col = colIndex;
+                    headerTypeBtn.style.opacity = '0.8';
+                    
+                    var hIcon = 'fa-align-left';
+                    var hTitle = 'Kopf: Text (links)';
+                    if (col.header_type === 'center') { hIcon = 'fa-align-center'; hTitle = 'Kopf: Zentriert'; }
+                    else if (col.header_type === 'number') { hIcon = 'fa-align-right'; hTitle = 'Kopf: Rechts'; }
+                    
+                    headerTypeBtn.title = hTitle;
+                    headerTypeBtn.innerHTML = '<i class="rex-icon ' + hIcon + '"></i>';
+                    
+                    // --- Body Align Button ---
                     var typeBtn = document.createElement('button');
                     typeBtn.type = 'button';
                     typeBtn.className = 'btn btn-default btn-xs fields-table-col-type';
                     typeBtn.dataset.col = colIndex;
                     
                     var iconClass = 'fa-align-left';
-                    var titleText = 'Text (links)';
-                    if (col.type === 'center') { iconClass = 'fa-align-center'; titleText = 'Zentriert'; }
-                    else if (col.type === 'number') { iconClass = 'fa-sort-numeric-asc'; titleText = 'Zahl (rechts)'; }
+                    var titleText = 'Daten: Text (links)';
+                    if (col.type === 'center') { iconClass = 'fa-align-center'; titleText = 'Daten: Zentriert'; }
+                    else if (col.type === 'number') { iconClass = 'fa-sort-numeric-asc'; titleText = 'Daten: Zahl (rechts)'; }
 
                     typeBtn.title = titleText;
                     typeBtn.innerHTML = '<i class="rex-icon ' + iconClass + '"></i>';
 
                     // Insert Col Button (Inline)
-                    var addColInlineBtn = '';
+                    var addColInlineBtn = null;
                     if (canAddCol) {
                         addColInlineBtn = document.createElement('button');
                         addColInlineBtn.type = 'button';
                         addColInlineBtn.className = 'btn btn-default btn-xs fields-table-add-col-inline';
                         addColInlineBtn.dataset.col = colIndex;
                         addColInlineBtn.title = 'Spalte rechts einfügen';
-                        addColInlineBtn.style.marginLeft = '2px';
                         addColInlineBtn.innerHTML = '<i class="rex-icon fa-plus"></i>';
                     }
                     
                     // Delete Col Button
-                    var delBtn = '';
+                    var delBtn = null;
                     if (canDelCol) {
-                        delBtn = '<button type="button" class="btn btn-default btn-xs fields-table-del-col" data-col="' + colIndex + '" title="Spalte löschen" style="margin-left:5px; color:#d9534f;"><i class="rex-icon fa-times"></i></button>';
+                        delBtn = document.createElement('button');
+                        delBtn.type = 'button';
+                        delBtn.className = 'btn btn-default btn-xs fields-table-del-col';
+                        delBtn.dataset.col = colIndex;
+                        delBtn.title = 'Spalte löschen';
+                        delBtn.style.color = '#d9534f';
+                        delBtn.innerHTML = '<i class="rex-icon fa-times"></i>';
                     }
 
-                    th.appendChild(typeBtn);
-                    if (addColInlineBtn) th.appendChild(addColInlineBtn);
-                    if (delBtn) {
-                        var span = document.createElement('span');
-                        span.innerHTML = delBtn;
-                        th.appendChild(span.firstChild);
-                    }
+                    colWrapper.appendChild(headerTypeBtn);
+                    colWrapper.appendChild(typeBtn);
+                    if (addColInlineBtn) colWrapper.appendChild(addColInlineBtn);
+                    if (delBtn) colWrapper.appendChild(delBtn);
+
+                    th.appendChild(colWrapper);
                     configRow.appendChild(th);
                 });
                 thead.appendChild(configRow);
@@ -145,13 +173,24 @@
                         input.type = 'text';
                         input.className = 'form-control input-sm';
                         
-                        if (colDef.type === 'center') input.style.textAlign = 'center';
-                        else if (colDef.type === 'number') input.style.textAlign = 'right';
-                        else input.style.textAlign = 'left';
+                        // Align Logic
+                        if (rowIndex === 0 && state.has_header_row) {
+                             // Header Row: Use Header Type
+                             var hType = colDef.header_type || 'text';
+                             if (hType === 'center') input.style.textAlign = 'center';
+                             else if (hType === 'number' || hType === 'right') input.style.textAlign = 'right';
+                             else input.style.textAlign = 'left';
+                        } else {
+                             // Data Rows (or Header Col): Use Body Type
+                             if (colDef.type === 'center') input.style.textAlign = 'center';
+                             else if (colDef.type === 'number') input.style.textAlign = 'right';
+                             else input.style.textAlign = 'left';
+                        }
 
                         input.value = cell;
                         input.dataset.row = rowIndex;
                         input.dataset.col = colIndex;
+
                         
                         // Actions (Add Row & Del Row)
                         var actionsHtml = '';
@@ -253,7 +292,21 @@
 
             // Buttons (Del Row/Col, Toggle Type)
             wrapper.addEventListener('click', function(e) {
-                // Toggle Type
+                // Toggle Header Type
+                var headerTypeBtn = e.target.closest('.fields-table-header-type');
+                if(headerTypeBtn) {
+                    var c = parseInt(headerTypeBtn.dataset.col);
+                    var currentType = state.cols[c].header_type || 'text';
+                    
+                    if (currentType === 'text') state.cols[c].header_type = 'center';
+                    else if (currentType === 'center') state.cols[c].header_type = 'number';
+                    else state.cols[c].header_type = 'text';
+
+                    render();
+                    return;
+                }
+
+                // Toggle Body Type
                 var typeBtn = e.target.closest('.fields-table-col-type');
                 if(typeBtn) {
                     var c = parseInt(typeBtn.dataset.col);
@@ -274,6 +327,8 @@
                     var c = parseInt(addColInlineBtn.dataset.col);
                     // Insert after current col
                     state.cols.splice(c + 1, 0, {type: 'text'});
+                    // New column inherits empty or default header type? Default text.
+                    state.cols[c+1].header_type = 'text';
                     state.rows.forEach(function(r) { r.splice(c + 1, 0, ''); });
                     render();
                     return;

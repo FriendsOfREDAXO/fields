@@ -97,4 +97,16 @@ class rex_yform_value_fields_iban extends rex_yform_value_abstract
             'famous' => false,
         ];
     }
+
+    public static function getListValue(array $params)
+    {
+        $value = $params['value'];
+        if (!$value) return '-';
+        
+        // Formatted spacing for display (DE89 1234 5678 ...)
+        $formatted = trim(chunk_split($value, 4, ' '));
+        
+        // Blurred output
+        return '<span class="text-monospace" onmouseover="this.style.filter=\'none\'" onmouseout="this.style.filter=\'blur(4px)\'" style="filter: blur(4px); transition: filter 0.2s; cursor: help; display:inline-block;">' . rex_escape($formatted) . '</span>';
+    }
 }

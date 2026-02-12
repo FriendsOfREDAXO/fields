@@ -53,4 +53,17 @@ class rex_yform_value_fields_rating extends rex_yform_value_abstract
             'famous' => false,
         ];
     }
-}
+    public static function getListValue(array $params)
+    {
+        $value = (int)$params['value'];
+        if ($value <= 0) return '-';
+        
+        // Stars Output
+        $out = '<span style="white-space:nowrap; color:#f0ad4e;">';
+        for($i=0; $i<$value; $i++) {
+            $out .= '★';
+        }
+        $out .= '</span> <small class="text-muted">(' . $value . ')</small>';
+        
+        return $out;
+    }}

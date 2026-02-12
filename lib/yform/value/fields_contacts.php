@@ -119,4 +119,59 @@ class rex_yform_value_fields_contacts extends rex_yform_value_abstract
             'famous' => false,
         ];
     }
+    
+    public static function getListValue(array $params)
+    {
+        $value = $params['value'];
+        if (!$value) return '-';
+
+        $contacts = json_decode($value, true);
+        if (!$contacts || !is_array($contacts)) return '-';
+        
+        $count = count($contacts);
+        if ($count === 0) return '-';
+        
+        $items = [];
+        $maxShow = 3;
+        
+        foreach ($contacts as $c) {
+            $parts = [];
+            
+            // Name (First Last)
+            $nameParts = array_filter([$c['firstname'] ?? '', $c['lastname'] ?? '']);
+            $hasName = !empty($nameParts);
+            if ($hasName) {
+                $parts[] = '<strong>' . rex_escape(implode(' ', $nameParts)) . '</strong>';
+            }
+            
+            // Company
+            if (!empty($c['company'])) {
+                $comp = rex_escape($c['company']);
+                if ($hasName) {
+                    $parts[] = '<span class="text-muted">(' . $comp . ')</span>';
+                } else {
+                    $parts[] = '<strong>' . $comp . '</strong>';
+                }
+            }
+            
+            // Email
+            if (!empty($c['email'])) {
+                $parts[] = '<a href="mailto:' . rex_escape($c['email']) . '" title="' . rex_escape($c['email']) . '" onclick="event.stopPropagation();"><i class="rex-icon fa-envelope-o"></i></a>';
+            }
+
+            if ($parts) {
+                // Formatting: Name (Company) Email
+                $items[] = '<div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.3;">' . implode(' ', $parts) . '</div>';
+            }
+        }
+        
+        $display = array_slice($items, 0, $maxShow);
+        $out = implode('', $display);
+        
+        if ($count > $maxShow) {
+             $out .= '<div class="text-muted" style="font-size: 85%; padding-top:2px;">(+' . ($count - $maxShow) . ' weitere)</div>';
+        }
+        
+        return $out;
+    }
 }

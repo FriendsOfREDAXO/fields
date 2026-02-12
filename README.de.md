@@ -9,6 +9,7 @@ Das AddOn **Fields** stellt 8 zusätzliche YForm-Value-Feldtypen bereit, die hä
 - **Social Web** – Repeater für Social-Media-Profile mit 24 vordefinierten Plattformen (Font Awesome & UIkit Icons)
 - **Öffnungszeiten** – Wochentags-Editor mit Zeitfenstern, Sondertagen und Notizen
 - **Kontakte** – Flexible Kontaktkarten mit konfigurierbaren optionalen Feldern (Avatar, Firma, Adresse, etc.)
+- **Tabelle** – Barrierefreier Tabelleneditor mit flexiblen Spalten/Zeilen, Min/Max-Constraints und unabhängiger Ausrichtung für Kopf und Daten
 - **IBAN** – IBAN-Eingabe mit Live-Validierung über openIBAN.com (serverseitig geproxied)
 - **FAQ** – Frage/Antwort-Repeater mit automatischer Schema.org FAQPage JSON-LD Ausgabe
 - **Conditional** – Bedingte Feldgruppen (Felder ein-/ausblenden basierend auf anderen Feldwerten)
@@ -38,6 +39,7 @@ Die Feldtypen erscheinen nach der Installation automatisch in der YForm-Feldausw
 | `fields_social_web` | `mediumtext` | Social-Media-Profile als JSON |
 | `fields_opening_hours` | `mediumtext` | Öffnungszeiten als JSON |
 | `fields_contacts` | `mediumtext` | Kontaktdaten als JSON |
+| `fields_table` | `mediumtext` | Tabelle mit Spalten- und Zeilendaten sowie Meta-Infos |
 | `fields_iban` | `varchar(34)` | IBAN mit Validierung |
 | `fields_faq` | `mediumtext` | FAQ-Einträge als JSON |
 | `fields_conditional` | *kein DB-Feld* | Steuert Sichtbarkeit anderer Felder |
@@ -90,6 +92,22 @@ $today = $helper->getToday();
 // Gruppierte Öffnungszeiten (Mo–Fr zusammengefasst wenn gleich)
 $grouped = $helper->getRegularGrouped();
 ```
+
+### Tabelle (Barrierefrei)
+
+Die Tabelle speichert Daten und Spaltenkonfiguration getrennt, was responsive Darstellungen erleichtert.
+
+```php
+$fragment = new rex_fragment();
+$fragment->setVar('json', $item->getValue('table'));
+echo $fragment->parse('fields/bootstrap3/table.php');
+```
+
+**Funktionen des Editors:**
+- Definierbare **Min/Max-Grenzen** für Zeilen und Spalten
+- Unabhängige **Textausrichtung** für Kopf- und Datenzellen (Links, Mitte, Rechts/Zahl)
+- **Inline-Hinzufügen** von Zeilen und Spalten mitten in der Tabelle
+- Strict Mode für Kopfzeilen/spalten (zwingend an/aus oder optional)
 
 ### Kontakte
 
@@ -247,6 +265,27 @@ Alle komplexen Felder speichern ihre Daten als JSON. Beispiele:
     {"question": "Wie sind die Öffnungszeiten?", "answer": "Mo–Fr 8–17 Uhr"},
     {"question": "Wo finde ich Parkplätze?", "answer": "Direkt hinter dem Gebäude."}
 ]
+```
+</details>
+
+<details>
+<summary><strong>Tabelle JSON</strong></summary>
+
+```json
+{
+    "caption": "Preisliste 2024",
+    "has_header_row": true,
+    "has_header_col": false,
+    "cols": [
+         {"type": "text", "header_type": "text"},
+         {"type": "number", "header_type": "right"},
+         {"type": "center", "header_type": "center"}
+    ],
+    "rows": [
+         ["Produkt A", "10,00 €", "Lagernd"],
+         ["Produkt B", "20,00 €", "Bestellt"]
+    ]
+}
 ```
 </details>
 

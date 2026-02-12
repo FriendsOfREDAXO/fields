@@ -93,6 +93,7 @@ fields_faq_question = Frage
 fields_faq_answer = Antwort
 fields_faq_add = Frage hinzufügen
 fields_faq_remove = Frage entfernen
+fields_faq_entries_label = Fragen
 fields_faq_schema = Schema.org JSON-LD ausgeben
 
 # QR Code

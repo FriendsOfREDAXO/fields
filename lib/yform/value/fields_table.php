@@ -57,4 +57,26 @@ class rex_yform_value_fields_table extends rex_yform_value_abstract
             'famous' => false,
         ];
     }
+
+    public static function getListValue(array $params)
+    {
+        $value = $params['value'];
+        if (!$value) {
+            return '-';
+        }
+
+        $data = json_decode($value, true);
+        if (!$data || !isset($data['rows']) || !is_array($data['rows'])) {
+            return '-';
+        }
+
+        $rowCount = count($data['rows']);
+        $colCount = isset($data['cols']) ? count($data['cols']) : 0;
+
+        if ($rowCount === 0) {
+            return '-';
+        }
+
+        return sprintf('Tabelle (%d Zeilen, %d Spalten)', $rowCount, $colCount);
+    }
 }
