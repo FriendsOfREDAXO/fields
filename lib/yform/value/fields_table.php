@@ -44,6 +44,12 @@ class rex_yform_value_fields_table extends rex_yform_value_abstract
             'values' => [
                 'name' => ['type' => 'name', 'label' => rex_i18n::msg('yform_values_defaults_name')],
                 'label' => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_defaults_label')],
+                'min_cols' => ['type' => 'text', 'label' => 'Min. Spalten', 'notice' => 'Standard: 1'],
+                'max_cols' => ['type' => 'text', 'label' => 'Max. Spalten', 'notice' => 'Leer lassen für unbegrenzt'],
+                'min_rows' => ['type' => 'text', 'label' => 'Min. Zeilen', 'notice' => 'Standard: 1'],
+                'max_rows' => ['type' => 'text', 'label' => 'Max. Zeilen', 'notice' => 'Leer lassen für unbegrenzt'],
+                'header_row_policy' => ['type' => 'choice', 'label' => 'Kopfzeile', 'choices' => 'Benutzer entscheidet=user,Immer an=yes,Immer aus=no', 'default' => 'user'],
+                'header_col_policy' => ['type' => 'choice', 'label' => 'Kopfspalte', 'choices' => 'Benutzer entscheidet=user,Immer an=yes,Immer aus=no', 'default' => 'user'],
                 'notice' => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_defaults_notice')],
             ],
             'description' => 'Ein barrierefreier Tabelleneditor',

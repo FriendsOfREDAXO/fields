@@ -29,6 +29,30 @@ $id = $this->getFieldId();
 $name = $this->getFieldName();
 $notice = $this->getElement('notice');
 
+// Constraints / Policies
+$minCols = (int)($this->getElement('min_cols') ?: 1);
+$maxCols = (int)($this->getElement('max_cols') ?: 999);
+$minRows = (int)($this->getElement('min_rows') ?: 1);
+$maxRows = (int)($this->getElement('max_rows') ?: 999);
+$headerRowPolicy = $this->getElement('header_row_policy') ?: 'user'; // user, yes, no
+$headerColPolicy = $this->getElement('header_col_policy') ?: 'user'; // user, yes, no
+
+// Enforce Policies in Initial Data (if new/empty or forced)
+if ($headerRowPolicy === 'yes') $data['has_header_row'] = true;
+if ($headerRowPolicy === 'no') $data['has_header_row'] = false;
+if ($headerColPolicy === 'yes') $data['has_header_col'] = true;
+if ($headerColPolicy === 'no') $data['has_header_col'] = false;
+
+// Pass Config to JS
+$config = [
+    'minCols' => $minCols,
+    'maxCols' => $maxCols,
+    'minRows' => $minRows,
+    'maxRows' => $maxRows,
+    'headerRowPolicy' => $headerRowPolicy, // user, yes, no
+    'headerColPolicy' => $headerColPolicy  // user, yes, no
+];
+
 ?>
 <div class="<?= $this->getHTMLClass() ?> fields-table-wrapper" id="<?= $this->getHTMLId() ?>" data-fields-table>
     <label class="control-label"><?= $this->getLabel() ?></label>
@@ -46,18 +70,27 @@ $notice = $this->getElement('notice');
         </div>
         <div class="panel-body" style="overflow-x: auto;">
             <div class="form-inline" style="margin-bottom: 10px;">
+                <?php if ($headerRowPolicy === 'user'): ?>
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" class="fields-table-config" data-config="has_header_row" <?= ($data['has_header_row'] ?? false) ? 'checked' : '' ?>>
                         Erste Zeile ist Kopfzeile
                     </label>
                 </div>
+                <?php else: ?>
+                    <input type="hidden" class="fields-table-config" data-config="has_header_row" value="<?= $data['has_header_row'] ? '1' : '0' ?>">
+                <?php endif; ?>
+
+                <?php if ($headerColPolicy === 'user'): ?>
                 <div class="checkbox" style="margin-left: 15px;">
                     <label>
                         <input type="checkbox" class="fields-table-config" data-config="has_header_col" <?= ($data['has_header_col'] ?? false) ? 'checked' : '' ?>>
                         Erste Spalte ist Kopfspalte
                     </label>
                 </div>
+                <?php else: ?>
+                    <input type="hidden" class="fields-table-config" data-config="has_header_col" value="<?= $data['has_header_col'] ? '1' : '0' ?>">
+                <?php endif; ?>
             </div>
 
             <table class="table table-bordered table-striped fields-table-editor">
@@ -81,11 +114,12 @@ $notice = $this->getElement('notice');
     <?php if ($notice): ?>
         <p class="help-block small"><?= rex_i18n::translate($notice, false) ?></p>
     <?php endif; ?>
+    <script type="template" id="<?= $id ?>_data">
+        <?= json_encode([
+            'rows' => $data['rows'] ?? [],
+            'cols' => $data['cols'] ?? [],
+            'config' => $config
+        ]) ?>
+    </script>
 </div>
 
-<script type="template" id="<?= $id ?>_data">
-    <?= json_encode([
-        'rows' => $data['rows'] ?? [],
-        'cols' => $data['cols'] ?? []
-    ]) ?>
-</script>

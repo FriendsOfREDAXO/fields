@@ -17,27 +17,61 @@
             var dataScript = wrapper.querySelector('script[type="template"]');
             var parsedData = JSON.parse(dataScript ? dataScript.innerHTML : '{}');
             
+            var config = parsedData.config || {
+                minCols: 1, maxCols: 999,
+                minRows: 1, maxRows: 999,
+                headerRowPolicy: 'user',
+                headerColPolicy: 'user'
+            };
+
+            function getBoolConfig(name) {
+                var el = wrapper.querySelector('[data-config="' + name + '"]');
+                if(!el) return false;
+                return el.type === 'checkbox' ? el.checked : (el.value === '1');
+            }
+            
             var state = {
                 rows: parsedData.rows || [],
                 cols: parsedData.cols || [],
                 caption: captionInput ? captionInput.value : '',
-                has_header_row: wrapper.querySelector('[data-config="has_header_row"]').checked,
-                has_header_col: wrapper.querySelector('[data-config="has_header_col"]').checked
+                has_header_row: getBoolConfig('has_header_row'),
+                has_header_col: getBoolConfig('has_header_col')
             };
 
-            // Ensure at least one cell if empty & Init Cols
-            if (state.rows.length === 0) {
-                state.rows = [['']];
+            // Enforce Min Constraints immediately
+            while (state.rows.length < config.minRows) {
+                state.rows.push(new Array(state.cols ? state.cols.length : 1).fill(''));
             }
+            if (state.rows.length === 0) state.rows = [['']]; // Absolute fallback
+
             if (!state.cols || state.cols.length !== state.rows[0].length) {
                 state.cols = new Array(state.rows[0].length).fill({type: 'text'});
             }
+            while (state.cols.length < config.minCols) {
+                state.cols.push({type: 'text'});
+                state.rows.forEach(function(r) { r.push(''); });
+            }
+
+            // Sync initial enforcement to Hidden Input
+            updateHidden();
 
             function render() {
                 var thead = table.querySelector('thead');
                 var tbody = table.querySelector('tbody');
                 thead.innerHTML = '';
                 tbody.innerHTML = '';
+                
+                // Permission Flags
+                var canAddCol = state.cols.length < config.maxCols;
+                var canDelCol = state.cols.length > config.minCols;
+                var canAddRow = state.rows.length < config.maxRows;
+                var canDelRow = state.rows.length > config.minRows;
+
+                // Toggle Main Buttons
+                var mainAddRowBtn = wrapper.querySelector('.fields-table-add-row');
+                var mainAddColBtn = wrapper.querySelector('.fields-table-add-col');
+                if(mainAddRowBtn) mainAddRowBtn.style.display = canAddRow ? '' : 'none';
+                if(mainAddColBtn) mainAddColBtn.style.display = canAddCol ? '' : 'none';
 
                 // 1. Column Controls Row (Meta-Header)
                 var configRow = document.createElement('tr');
@@ -45,9 +79,6 @@
                 state.cols.forEach(function(col, colIndex) {
                     var th = document.createElement('th');
                     th.className = 'text-center';
-                    // Inline styles removed for better CSS control (Dark Mode compatibility)
-                    // th.style.background = '#f9f9f9';
-                    // th.style.borderBottom = '1px solid #ddd';
                     th.style.padding = '5px';
                     
                     // Column Type Toggle (Text/Center/Number)
@@ -63,14 +94,27 @@
 
                     typeBtn.title = titleText;
                     typeBtn.innerHTML = '<i class="rex-icon ' + iconClass + '"></i>';
+
+                    // Insert Col Button (Inline)
+                    var addColInlineBtn = '';
+                    if (canAddCol) {
+                        addColInlineBtn = document.createElement('button');
+                        addColInlineBtn.type = 'button';
+                        addColInlineBtn.className = 'btn btn-default btn-xs fields-table-add-col-inline';
+                        addColInlineBtn.dataset.col = colIndex;
+                        addColInlineBtn.title = 'Spalte rechts einfügen';
+                        addColInlineBtn.style.marginLeft = '2px';
+                        addColInlineBtn.innerHTML = '<i class="rex-icon fa-plus"></i>';
+                    }
                     
                     // Delete Col Button
                     var delBtn = '';
-                    if (state.rows[0].length > 1) {
+                    if (canDelCol) {
                         delBtn = '<button type="button" class="btn btn-default btn-xs fields-table-del-col" data-col="' + colIndex + '" title="Spalte löschen" style="margin-left:5px; color:#d9534f;"><i class="rex-icon fa-times"></i></button>';
                     }
 
                     th.appendChild(typeBtn);
+                    if (addColInlineBtn) th.appendChild(addColInlineBtn);
                     if (delBtn) {
                         var span = document.createElement('span');
                         span.innerHTML = delBtn;
@@ -113,9 +157,11 @@
                         var actionsHtml = '';
                         if (colIndex === row.length - 1) {
                              // Add Row Inline (Insert after)
-                             actionsHtml += '<button type="button" class="btn btn-default btn-xs fields-table-add-row-inline" data-row="' + rowIndex + '" title="Zeile darunter einfügen" tabindex="-1" style="margin-right:2px;"><i class="rex-icon fa-plus"></i></button>';
+                             if (canAddRow) {
+                                actionsHtml += '<button type="button" class="btn btn-default btn-xs fields-table-add-row-inline" data-row="' + rowIndex + '" title="Zeile darunter einfügen" tabindex="-1" style="margin-right:2px;"><i class="rex-icon fa-plus"></i></button>';
+                             }
 
-                             if (state.rows.length > 1) {
+                             if (canDelRow) {
                                  actionsHtml += '<button type="button" class="btn btn-default btn-xs fields-table-del-row" data-row="' + rowIndex + '" title="Zeile löschen" tabindex="-1"><i class="rex-icon fa-times"></i></button>';
                              }
                         }
@@ -169,7 +215,12 @@
             // Config Checkboxes & Caption
             wrapper.addEventListener('change', function(e) {
                 if(e.target.classList.contains('fields-table-config')) {
-                    state[e.target.dataset.config] = e.target.checked;
+                    // Prevent change if policy is strictly enforced (though UI should hide it)
+                    var key = e.target.dataset.config;
+                    if (key === 'has_header_row' && config.headerRowPolicy !== 'user') return;
+                    if (key === 'has_header_col' && config.headerColPolicy !== 'user') return;
+
+                    state[key] = e.target.checked;
                     render();
                 }
                 if(e.target.classList.contains('fields-table-caption')) {
@@ -182,6 +233,7 @@
             var addRowBtn = wrapper.querySelector('.fields-table-add-row');
             if(addRowBtn) {
                 addRowBtn.addEventListener('click', function() {
+                    if (state.rows.length >= config.maxRows) return;
                     var cols = state.rows[0] ? state.rows[0].length : 1;
                     state.rows.push(new Array(cols).fill(''));
                     render();
@@ -192,6 +244,7 @@
             var addColBtn = wrapper.querySelector('.fields-table-add-col');
             if(addColBtn) {
                 addColBtn.addEventListener('click', function() {
+                    if (state.cols.length >= config.maxCols) return;
                     state.cols.push({type: 'text'});
                     state.rows.forEach(function(r) { r.push(''); });
                     render();
@@ -214,9 +267,22 @@
                     return;
                 }
 
+                // Add Col Inline
+                var addColInlineBtn = e.target.closest('.fields-table-add-col-inline');
+                if(addColInlineBtn) {
+                    if (state.cols.length >= config.maxCols) return;
+                    var c = parseInt(addColInlineBtn.dataset.col);
+                    // Insert after current col
+                    state.cols.splice(c + 1, 0, {type: 'text'});
+                    state.rows.forEach(function(r) { r.splice(c + 1, 0, ''); });
+                    render();
+                    return;
+                }
+
                 // Add Row Inline
                 var addRowInlineBtn = e.target.closest('.fields-table-add-row-inline');
                 if(addRowInlineBtn) {
+                    if (state.rows.length >= config.maxRows) return;
                     var r = parseInt(addRowInlineBtn.dataset.row);
                     var cols = state.cols.length;
                     // Insert after current row
@@ -228,6 +294,7 @@
                 // Del Row
                 var delRowBtn = e.target.closest('.fields-table-del-row');
                 if(delRowBtn) {
+                    if (state.rows.length <= config.minRows) return;
                     var r = parseInt(delRowBtn.dataset.row);
                     state.rows.splice(r, 1);
                     render();
@@ -237,6 +304,7 @@
                 // Del Col
                 var delColBtn = e.target.closest('.fields-table-del-col');
                 if(delColBtn) {
+                    if (state.cols.length <= config.minCols) return;
                     var c = parseInt(delColBtn.dataset.col);
                     state.cols.splice(c, 1);
                     state.rows.forEach(function(row) { row.splice(c, 1); });

@@ -563,3 +563,13 @@ body.rex-theme-dark {
 body.rex-theme-dark .fields-table-editor .fields-is-header input.form-control {
     border-color: rgba(255,255,255,0.1);
 }
+
+/* Inline Col Add Button - Default Hidden */
+.fields-table-config-row th .fields-table-add-col-inline {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.fields-table-config-row th:hover .fields-table-add-col-inline {
+    opacity: 1;
+}
