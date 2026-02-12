@@ -314,7 +314,7 @@ Facebook, Instagram, Twitter/X, LinkedIn, Xing, YouTube, TikTok, Pinterest, Thre
 
 **Konzept & Entwicklung**
 
-Erstellt mit Unterstützung von GitHub Copilot (Claude)
+Erstellt mit Unterstützung von GitHub Copilot (Gemini)
 
 **Basiert auf:**
 
