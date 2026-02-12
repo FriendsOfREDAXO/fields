@@ -12,8 +12,7 @@ Das AddOn **Fields** stellt 8 zusätzliche YForm-Value-Feldtypen bereit, die hä
 - **IBAN** – IBAN-Eingabe mit Live-Validierung über openIBAN.com (serverseitig geproxied)
 - **FAQ** – Frage/Antwort-Repeater mit automatischer Schema.org FAQPage JSON-LD Ausgabe
 - **Conditional** – Bedingte Feldgruppen (Felder ein-/ausblenden basierend auf anderen Feldwerten)
-- **Icon Picker** – Icon-Auswahl aus Font Awesome und/oder UIkit-Iconsets
-
+- **Icon Picker** – Icon-Auswahl aus Font Awesome und/oder UIkit-Iconsets- **Star Rating** – Bewertungsfeld (1-10 Sterne) mit visueller Eingabe
 ## Installation
 
 1. Im REDAXO-Installer nach **fields** suchen und installieren
@@ -43,6 +42,7 @@ Die Feldtypen erscheinen nach der Installation automatisch in der YForm-Feldausw
 | `fields_faq` | `mediumtext` | FAQ-Einträge als JSON |
 | `fields_conditional` | *kein DB-Feld* | Steuert Sichtbarkeit anderer Felder |
 | `fields_icon_picker` | `varchar(191)` | Ausgewähltes Icon (z.B. `fa-home`) |
+| `fields_rating` | `int` | Ganzzahlige Bewertung (Default 1-5 Sterne) |
 
 ## Frontend-Ausgabe mit Fragmenten
 
@@ -145,6 +145,15 @@ $icon = $item->getValue('icon');
 echo '<i class="' . rex_escape($icon) . '"></i>';
 // UIkit
 echo '<span uk-icon="icon: ' . rex_escape(str_replace('uk-icon-', '', $icon)) . '"></span>';
+```
+
+### Star Rating (Bewertung)
+
+```php
+$fragment = new rex_fragment();
+$fragment->setVar('value', $item->getValue('rating'));
+$fragment->setVar('max', 5); // Optional, default 5
+echo $fragment->parse('fields/bootstrap3/rating.php');
 ```
 
 ## API-Endpunkte

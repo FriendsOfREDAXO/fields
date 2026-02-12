@@ -13,6 +13,7 @@ The **Fields** addon provides 8 additional YForm value field types covering comm
 - **FAQ** – Question/answer repeater with automatic Schema.org FAQPage JSON-LD output
 - **Conditional** – Conditional field groups (show/hide fields based on other field values)
 - **Icon Picker** – Icon selection from Font Awesome and/or UIkit icon sets
+- **Star Rating** – Rating field (1-10 stars) with visual input
 
 ## Installation
 
@@ -43,6 +44,7 @@ The field types automatically appear in the YForm field selection after installa
 | `fields_faq` | `mediumtext` | FAQ entries as JSON |
 | `fields_conditional` | *no DB field* | Controls visibility of other fields |
 | `fields_icon_picker` | `varchar(191)` | Selected icon (e.g. `fa-home`) |
+| `fields_rating` | `int` | Integer rating (default 1-5 stars) |
 
 ## Frontend Output with Fragments
 
@@ -145,6 +147,15 @@ $icon = $item->getValue('icon');
 echo '<i class="' . rex_escape($icon) . '"></i>';
 // UIkit
 echo '<span uk-icon="icon: ' . rex_escape(str_replace('uk-icon-', '', $icon)) . '"></span>';
+```
+
+### Star Rating
+
+```php
+$fragment = new rex_fragment();
+$fragment->setVar('value', $item->getValue('rating'));
+$fragment->setVar('max', 5); // Optional, default 5
+echo $fragment->parse('fields/bootstrap3/rating.php');
 ```
 
 ## API Endpoints
