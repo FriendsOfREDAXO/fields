@@ -32,6 +32,8 @@
     --fields-table-stripe-even: transparent;
     
     --fields-control-label: #333;
+    
+    --fields-table-header-cell-bg: rgba(77, 144, 254, 0.1); /* Light Blue Transparent */
 }
 
 /* --- Dark Mode Overrides (Explicit) --- */
@@ -63,6 +65,8 @@ body.rex-theme-dark {
     --fields-table-stripe-even: transparent;
     
     --fields-control-label: #dfe3e6;
+    
+    --fields-table-header-cell-bg: rgba(77, 144, 254, 0.2); /* Slightly more opaque on dark */
 }
 
 /* --- Auto Mode Overrides (System Preference = Dark) --- */
@@ -96,6 +100,8 @@ body.rex-theme-dark {
         --fields-table-stripe-even: transparent;
         
         --fields-control-label: #dfe3e6;
+        
+        --fields-table-header-cell-bg: rgba(77, 144, 254, 0.2);
     }
 }
 
@@ -487,4 +493,73 @@ body.rex-theme-dark {
     background-color: var(--fields-btn-bg);
     border-color: var(--fields-btn-border);
     color: var(--fields-btn-text);
+}
+
+
+/* ============================================================
+   Table Editor - Inline Action Buttons (Hover Only)
+   ============================================================ */
+
+/* 1. Alignment & Layout */
+.fields-table-cell-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.fields-table-actions {
+    display: flex;
+    align-items: center;
+    margin-left: 5px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* 2. Show on Row Hover */
+.fields-table-editor tr:hover .fields-table-actions {
+    opacity: 1;
+}
+
+/* 3. Handle Mobile visibility (optional but good practice) */
+@media (max-width: 768px) {
+    .fields-table-actions {
+        opacity: 1 !important;
+    }
+}
+
+/* 4. Column Header Buttons (Type + Delete) */
+.fields-table-config-row th {
+    position: relative;
+}
+
+/* Hide Delete Column Button until hover */
+.fields-table-config-row th .fields-table-del-col {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.fields-table-config-row th:hover .fields-table-del-col {
+    opacity: 1;
+}
+
+/* ============================================================
+   Header Cells (First Row / First Col) - Visual Feedback
+   ============================================================ */
+
+.fields-table-editor .fields-is-header,
+.fields-table-editor .fields-is-header input.form-control {
+    background-color: var(--fields-table-header-cell-bg) !important;
+    font-weight: 600;
+    color: var(--fields-table-text) !important;
+}
+
+/* Ensure placeholder/text contrast in headers if needed */
+.fields-table-editor .fields-is-header input.form-control {
+    border-color: rgba(0,0,0,0.1); 
+}
+
+/* Dark Mode tweak for borders inside headers if needed */
+body.rex-theme-dark .fields-table-editor .fields-is-header input.form-control {
+    border-color: rgba(255,255,255,0.1);
 }

@@ -50,13 +50,19 @@
                     // th.style.borderBottom = '1px solid #ddd';
                     th.style.padding = '5px';
                     
-                    // Column Type Toggle (Text/Number)
+                    // Column Type Toggle (Text/Center/Number)
                     var typeBtn = document.createElement('button');
                     typeBtn.type = 'button';
                     typeBtn.className = 'btn btn-default btn-xs fields-table-col-type';
                     typeBtn.dataset.col = colIndex;
-                    typeBtn.title = col.type === 'number' ? 'Zahlenformat (rechtsbündig)' : 'Textformat (linksbündig)';
-                    typeBtn.innerHTML = col.type === 'number' ? '<i class="rex-icon fa-sort-numeric-asc"></i>' : '<i class="rex-icon fa-align-left"></i>';
+                    
+                    var iconClass = 'fa-align-left';
+                    var titleText = 'Text (links)';
+                    if (col.type === 'center') { iconClass = 'fa-align-center'; titleText = 'Zentriert'; }
+                    else if (col.type === 'number') { iconClass = 'fa-sort-numeric-asc'; titleText = 'Zahl (rechts)'; }
+
+                    typeBtn.title = titleText;
+                    typeBtn.innerHTML = '<i class="rex-icon ' + iconClass + '"></i>';
                     
                     // Delete Col Button
                     var delBtn = '';
@@ -81,6 +87,9 @@
                         var isHeader = (rowIndex === 0 && state.has_header_row) || (colIndex === 0 && state.has_header_col);
                         var cellType = isHeader ? 'th' : 'td';
                         var cellEl = document.createElement(cellType);
+                        if (isHeader) {
+                            cellEl.classList.add('fields-is-header');
+                        }
                         var colDef = state.cols[colIndex] || {type: 'text'};
                         
                         // Wrapper for Input + Actions
@@ -91,15 +100,24 @@
                         var input = document.createElement('input');
                         input.type = 'text';
                         input.className = 'form-control input-sm';
-                        input.style.textAlign = colDef.type === 'number' ? 'right' : 'left';
+                        
+                        if (colDef.type === 'center') input.style.textAlign = 'center';
+                        else if (colDef.type === 'number') input.style.textAlign = 'right';
+                        else input.style.textAlign = 'left';
+
                         input.value = cell;
                         input.dataset.row = rowIndex;
                         input.dataset.col = colIndex;
                         
-                        // Actions (Del Row only)
+                        // Actions (Add Row & Del Row)
                         var actionsHtml = '';
-                        if (colIndex === row.length - 1 && state.rows.length > 1) {
-                             actionsHtml += '<button type="button" class="btn btn-default btn-xs fields-table-del-row" data-row="' + rowIndex + '" title="Zeile löschen" tabindex="-1"><i class="rex-icon fa-times"></i></button>';
+                        if (colIndex === row.length - 1) {
+                             // Add Row Inline (Insert after)
+                             actionsHtml += '<button type="button" class="btn btn-default btn-xs fields-table-add-row-inline" data-row="' + rowIndex + '" title="Zeile darunter einfügen" tabindex="-1" style="margin-right:2px;"><i class="rex-icon fa-plus"></i></button>';
+
+                             if (state.rows.length > 1) {
+                                 actionsHtml += '<button type="button" class="btn btn-default btn-xs fields-table-del-row" data-row="' + rowIndex + '" title="Zeile löschen" tabindex="-1"><i class="rex-icon fa-times"></i></button>';
+                             }
                         }
 
                         wrapperDiv.appendChild(input);
@@ -186,7 +204,23 @@
                 var typeBtn = e.target.closest('.fields-table-col-type');
                 if(typeBtn) {
                     var c = parseInt(typeBtn.dataset.col);
-                    state.cols[c].type = state.cols[c].type === 'text' ? 'number' : 'text';
+                    var currentType = state.cols[c].type || 'text';
+                    
+                    if (currentType === 'text') state.cols[c].type = 'center';
+                    else if (currentType === 'center') state.cols[c].type = 'number';
+                    else state.cols[c].type = 'text';
+
+                    render();
+                    return;
+                }
+
+                // Add Row Inline
+                var addRowInlineBtn = e.target.closest('.fields-table-add-row-inline');
+                if(addRowInlineBtn) {
+                    var r = parseInt(addRowInlineBtn.dataset.row);
+                    var cols = state.cols.length;
+                    // Insert after current row
+                    state.rows.splice(r + 1, 0, new Array(cols).fill(''));
                     render();
                     return;
                 }
