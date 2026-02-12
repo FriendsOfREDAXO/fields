@@ -57,7 +57,7 @@ class rex_yform_value_fields_conditional extends rex_yform_value_abstract
                 'operator' => [
                     'type' => 'choice',
                     'label' => rex_i18n::msg('fields_conditional_operator'),
-                    'choices' => '==gleich (=),!=ungleich (!=),>größer (>),<kleiner (<),contains=enthält (contains),empty=leer (empty),!empty=nicht leer (!empty)',
+                    'choices' => '==gleich (=),!=ungleich (!=),>größer (>),<kleiner (<),contains=enthält (contains),empty=leer (empty),!empty=nicht leer (!empty),switch=Ziel entspricht Wert (Switch)',
                     'default' => '=',
                 ],
                 'compare_value' => ['type' => 'text', 'label' => rex_i18n::msg('fields_conditional_value')],

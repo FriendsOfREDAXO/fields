@@ -130,8 +130,9 @@ Die IBAN-Validierung über openIBAN.com erfolgt live im Backend-Formular. Der AP
 Das Conditional-Feld benötigt keine Frontend-Ausgabe – es steuert nur die Sichtbarkeit von Feldern im Backend:
 
 - **Quellfeld**: Das Feld, dessen Wert geprüft wird
-- **Operator**: `==`, `!=`, `>`, `<`, `contains`, `empty`, `!empty`
-- **Vergleichswert**: Der erwartete Wert
+- **Operator**: `==`, `!=`, `>`, `<`, `contains`, `empty`, `!empty`, `switch`
+  - *Hinweis zu Switch:* Vergleicht den aktuellen Wert mit dem Ziel-Selektor. Ist z.B. der Wert `video`, wird das Ziel `.group-video` oder `type_video` angezeigt.
+- **Vergleichswert**: Der erwartete Wert (bei `switch` irrelevant)
 - **Zielfelder**: Kommagetrennte Liste von Feldnamen ODER CSS-Selektoren
   - *Beispiel Feldnamen:* `street,city` (sucht nach Feldern oder Wrapper-IDs wie `*-city`)
   - *Beispiel CSS-Selektor:* `.my-group,#special-section` (blendet beliebige Elemente ein/aus)

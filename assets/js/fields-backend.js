@@ -856,6 +856,31 @@
                     default: match = val === compareValue;
                 }
 
+                if (operator === 'switch') {
+                    // Switch Mode: Vergleicht Target-Name/Klasse mit dem aktuellen Wert
+                    targetFields.forEach(function (fieldName) {
+                        fieldName = fieldName.trim();
+                        if (!fieldName) return;
+                        
+                        var cleanTarget = fieldName.replace(/^[.#]/, '');
+                        // Match wenn Target exakt Wert ist oder Target auf "-Wert" oder "_Wert" endet
+                        var isMatch = (cleanTarget === val) || fieldName.endsWith('-' + val) || fieldName.endsWith('_' + val);
+                        
+                        // Toggle Logic for Switch
+                        if (fieldName.startsWith('.') || fieldName.startsWith('#')) {
+                            document.querySelectorAll(fieldName).forEach(function(el) {
+                                el.style.display = isMatch ? '' : 'none';
+                            });
+                        } else {
+                            var targetWrapper = document.querySelector('div[id$="-' + fieldName + '"]');
+                            if (targetWrapper) {
+                                targetWrapper.style.display = isMatch ? '' : 'none';
+                            }
+                        }
+                    });
+                    return; // Early exit für Switch Mode
+                }
+
                 var shouldShow = (action === 'show') ? match : !match;
 
                 targetFields.forEach(function (fieldName) {
