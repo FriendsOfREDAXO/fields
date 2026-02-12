@@ -1,6 +1,104 @@
 /**
  * Fields Addon - Backend Styles
+ * Refactored to use CSS Variables for robust Theme Support (Light/Dark/Auto)
  */
+
+:root {
+    /* --- Light Mode Defaults (Base) --- */
+    --fields-wrapper-bg: rgba(255, 255, 255, 0.4);
+    --fields-wrapper-border: rgba(0, 0, 0, 0.05);
+
+    --fields-panel-bg: #fff;
+    --fields-panel-border: rgba(0, 0, 0, 0.1);
+    --fields-panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    --fields-heading-bg: rgba(0, 0, 0, 0.03);
+    --fields-heading-border: rgba(0, 0, 0, 0.05);
+    --fields-heading-text: #333;
+
+    --fields-table-th-bg: #f9f9f9;
+    --fields-table-th-border: #ddd;
+    --fields-table-text: #333;
+    
+    --fields-input-bg: #fff;
+    --fields-input-border: #ccc;
+    --fields-input-text: #555;
+    
+    --fields-btn-bg: #fff;
+    --fields-btn-border: #ccc;
+    --fields-btn-text: #333;
+    
+    --fields-table-stripe-odd: #f9f9f9;
+    --fields-table-stripe-even: transparent;
+    
+    --fields-control-label: #333;
+}
+
+/* --- Dark Mode Overrides (Explicit) --- */
+body.rex-theme-dark {
+    --fields-wrapper-bg: rgba(255, 255, 255, 0.05);
+    --fields-wrapper-border: rgba(255, 255, 255, 0.05);
+
+    --fields-panel-bg: #202b35;
+    --fields-panel-border: rgba(255, 255, 255, 0.1);
+    --fields-panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+    --fields-heading-bg: rgba(255, 255, 255, 0.05);
+    --fields-heading-border: rgba(255, 255, 255, 0.1);
+    --fields-heading-text: #fff;
+
+    --fields-table-th-bg: rgba(0, 0, 0, 0.2);
+    --fields-table-th-border: rgba(255, 255, 255, 0.1);
+    --fields-table-text: #dfe3e6;
+
+    --fields-input-bg: rgba(0, 0, 0, 0.2);
+    --fields-input-border: rgba(255, 255, 255, 0.1);
+    --fields-input-text: #fff;
+    
+    --fields-btn-bg: rgba(255, 255, 255, 0.1);
+    --fields-btn-border: rgba(255, 255, 255, 0.2);
+    --fields-btn-text: #fff;
+    
+    --fields-table-stripe-odd: rgba(255, 255, 255, 0.05);
+    --fields-table-stripe-even: transparent;
+    
+    --fields-control-label: #dfe3e6;
+}
+
+/* --- Auto Mode Overrides (System Preference = Dark) --- */
+/* Activates when system is dark AND user has NOT explicitly selected light theme */
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) {
+        --fields-wrapper-bg: rgba(255, 255, 255, 0.05);
+        --fields-wrapper-border: rgba(255, 255, 255, 0.05);
+    
+        --fields-panel-bg: #202b35;
+        --fields-panel-border: rgba(255, 255, 255, 0.1);
+        --fields-panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    
+        --fields-heading-bg: rgba(255, 255, 255, 0.05);
+        --fields-heading-border: rgba(255, 255, 255, 0.1);
+        --fields-heading-text: #fff;
+    
+        --fields-table-th-bg: rgba(0, 0, 0, 0.2);
+        --fields-table-th-border: rgba(255, 255, 255, 0.1);
+        --fields-table-text: #dfe3e6;
+    
+        --fields-input-bg: rgba(0, 0, 0, 0.2);
+        --fields-input-border: rgba(255, 255, 255, 0.1);
+        --fields-input-text: #fff;
+        
+        --fields-btn-bg: rgba(255, 255, 255, 0.1);
+        --fields-btn-border: rgba(255, 255, 255, 0.2);
+        --fields-btn-text: #fff;
+        
+        --fields-table-stripe-odd: rgba(255, 255, 255, 0.05);
+        --fields-table-stripe-even: transparent;
+        
+        --fields-control-label: #dfe3e6;
+    }
+}
+
 
 /* ============================================================
    Repeater (shared)
@@ -70,6 +168,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    color: var(--fields-heading-text); /* Use Variable */
 }
 
 .fields-repeater-heading .btn {
@@ -93,7 +192,9 @@
 }
 
 .fields-media-field .fields-media-input {
-    background-color: #fff;
+    background-color: var(--fields-input-bg);
+    color: var(--fields-input-text);
+    border-color: var(--fields-input-border);
 }
 
 .fields-media-preview {
@@ -102,10 +203,10 @@
 
 .fields-media-preview img {
     max-height: 80px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--fields-input-border);
     border-radius: 3px;
     padding: 2px;
-    background: #fff;
+    background: var(--fields-input-bg);
 }
 
 /* Crop Overlay / Modal */
@@ -123,7 +224,7 @@
 }
 
 .fields-crop-modal {
-    background: #fff;
+    background: #fff; /* Modal usually stays light or needs specific logic */
     border-radius: 4px;
     box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
     max-width: 620px;
@@ -132,6 +233,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    color: #333; /* Reset text color for modal content */
 }
 
 .fields-crop-header {
@@ -197,7 +299,7 @@
 
 .fields-iban-result {
     padding: 4px 0;
-    color: #555;
+    color: var(--fields-text-color, #555);
 }
 
 /* ============================================================
@@ -209,6 +311,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 1px solid var(--fields-input-border);
 }
 
 .fields-qrcode-preview img {
@@ -304,4 +407,84 @@
     margin-left: 10px;
     vertical-align: middle;
     font-weight: bold;
+}
+
+
+/* ============================================================
+   Global View Implementation using CSS Variables
+   ============================================================ */
+
+/* Main Wrappers */
+.fields-table-wrapper,
+.fields-contacts-repeater,
+.fields-faq-repeater,
+.fields-social-web-repeater,
+.fields-opening-hours {
+    background: var(--fields-wrapper-bg);
+    border-radius: 6px;
+    border: 1px solid var(--fields-wrapper-border);
+    padding: 15px;
+}
+
+/* Panels (Cards within wrappers) */
+.fields-table-wrapper .panel,
+.fields-repeater-entry.panel,
+.fields-opening-hours .panel,
+.fields-contacts-repeater .panel {
+    background: var(--fields-panel-bg) !important;
+    box-shadow: var(--fields-panel-shadow) !important;
+    border: 1px solid var(--fields-panel-border) !important;
+    color: var(--fields-table-text);
+}
+
+/* Panel Headings */
+.fields-table-wrapper .panel-heading,
+.fields-repeater-entry .panel-heading,
+.fields-opening-hours .panel-heading {
+    background-color: var(--fields-heading-bg) !important;
+    border-bottom: 1px solid var(--fields-heading-border) !important;
+    color: var(--fields-heading-text);
+}
+
+/* Table Headers */
+.fields-table-config-row th {
+    background-color: var(--fields-table-th-bg) !important;
+    border-bottom: 1px solid var(--fields-table-th-border) !important;
+    color: var(--fields-table-text) !important;
+}
+
+/* Table Body Stripes */
+.fields-table-editor.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--fields-table-stripe-odd);
+}
+
+.fields-table-editor.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--fields-table-stripe-even);
+}
+
+/* Table Borders */
+.fields-table-editor.table-bordered > thead > tr > th,
+.fields-table-editor.table-bordered > tbody > tr > td {
+    border-color: var(--fields-heading-border);
+}
+
+/* Inputs within Wrappers */
+.fields-table-wrapper input.form-control,
+.fields-table-wrapper select.form-control, 
+.fields-table-wrapper textarea.form-control {
+    background-color: var(--fields-input-bg) !important;
+    border-color: var(--fields-input-border) !important;
+    color: var(--fields-input-text) !important;
+}
+
+/* Labels */
+.fields-table-wrapper .control-label {
+    color: var(--fields-control-label);
+}
+
+/* Configuration Buttons (in header row) */
+.fields-table-config-row .btn-default {
+    background-color: var(--fields-btn-bg);
+    border-color: var(--fields-btn-border);
+    color: var(--fields-btn-text);
 }

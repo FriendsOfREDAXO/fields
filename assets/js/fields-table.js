@@ -45,8 +45,9 @@
                 state.cols.forEach(function(col, colIndex) {
                     var th = document.createElement('th');
                     th.className = 'text-center';
-                    th.style.background = '#f9f9f9';
-                    th.style.borderBottom = '1px solid #ddd';
+                    // Inline styles removed for better CSS control (Dark Mode compatibility)
+                    // th.style.background = '#f9f9f9';
+                    // th.style.borderBottom = '1px solid #ddd';
                     th.style.padding = '5px';
                     
                     // Column Type Toggle (Text/Number)
