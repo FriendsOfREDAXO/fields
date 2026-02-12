@@ -280,3 +280,43 @@ Created with support of GitHub Copilot (Claude)
 ## License
 
 MIT License – see [LICENSE.md](LICENSE.md)
+
+## UI & Theme Support
+
+The addon supports the full REDAXO Dark Mode ecosystem:
+
+- **Light Mode**: Default styling
+- **Dark Mode**: Explicit styling for `body.rex-theme-dark`
+- **Auto Mode**: Supports system preference via `@media (prefers-color-scheme: dark)` when REDAXO is set to "Auto"
+- **Glassmorphism**: Modern UI elements with translucency in supported contexts
+
+## Table Editor
+
+A generic table editor field  is included for managing simple structured data:
+
+- **JSON Storage**: Saves data as standard JSON array
+- **Sortable**: Drag & Drop reordering (planned)
+- **Header Support**: First row/column can be designated as headers
+- **Accessibility**: Semantic HTML table structure
+- **Responsive**: Action buttons show on hover, stack on mobile
+
+
+## UI & Theme Support
+
+The addon supports the full REDAXO Dark Mode ecosystem:
+
+- **Light Mode**: Default styling
+- **Dark Mode**: Explicit styling for `body.rex-theme-dark`
+- **Auto Mode**: Supports system preference via `@media (prefers-color-scheme: dark)` when REDAXO is set to "Auto"
+- **Glassmorphism**: Modern UI elements with translucency in supported contexts
+
+## Table Editor
+
+A generic table editor field `fields_table_editor` is included for managing simple structured data:
+
+- **JSON Storage**: Saves data as standard JSON array
+- **Sortable**: Drag & Drop reordering (planned)
+- **Header Support**: First row/column can be designated as headers
+- **Accessibility**: Semantic HTML table structure
+- **Responsive**: Action buttons show on hover, stack on mobile
+
