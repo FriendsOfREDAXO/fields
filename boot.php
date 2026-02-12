@@ -44,4 +44,5 @@ if (rex::isBackend() && rex::getUser()) {
 
     rex_view::addCssFile($addon->getAssetsUrl('css/fields-backend.css'));
     rex_view::addJsFile($addon->getAssetsUrl('js/fields-backend.js'));
+    rex_view::addJsFile($addon->getAssetsUrl('js/fields-table.js'));
 }
