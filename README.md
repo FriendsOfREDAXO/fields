@@ -130,9 +130,11 @@ IBAN validation via openIBAN.com runs live in the backend form. API calls are pr
 The conditional field requires no frontend output – it only controls field visibility in the backend:
 
 - **Source field**: The field whose value is checked
-- **Operator**: `=`, `!=`, `>`, `<`, `contains`, `empty`, `!empty`
+- **Operator**: `==`, `!=`, `>`, `<`, `contains`, `empty`, `!empty`
 - **Compare value**: The expected value
-- **Target fields**: Comma-separated list of field names
+- **Target fields**: Comma-separated list of field names OR CSS selectors
+  - *Example field names:* `street,city` (searches for fields or wrapper IDs like `*-city`)
+  - *Example CSS selector:* `.my-group,#special-section` (toggles any matching elements)
 - **Action**: `show` or `hide`
 
 ### Icon Picker

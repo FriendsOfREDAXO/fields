@@ -826,11 +826,19 @@
 
             if (!sourceField || targetFields.length === 0) return;
 
-            // Source input finden (YForm Namenskonvention)
-            var sourceInput = document.querySelector('[name*="[' + sourceField + ']"]');
-            if (!sourceInput) {
-                sourceInput = document.querySelector('#yform-data_edit-' + sourceField + '-' + sourceField);
+            // Source Input finden: Primär über Wrapper ID (div[id$="-feldname"])
+            var sourceWrapper = document.querySelector('div[id$="-' + sourceField + '"]');
+            var sourceInput = null;
+
+            if (sourceWrapper) {
+                sourceInput = sourceWrapper.querySelector('input, select, textarea');
             }
+
+            // Fallback für Sonderfälle: Direktes Input-Match falls Wrapper nicht greifbar
+            if (!sourceInput) {
+                sourceInput = document.querySelector('[name*="[' + sourceField + ']"]');
+            }
+
             if (!sourceInput) return;
 
             function evaluate() {
@@ -851,14 +859,25 @@
                 var shouldShow = (action === 'show') ? match : !match;
 
                 targetFields.forEach(function (fieldName) {
-                    var targetEl = document.querySelector('[name*="[' + fieldName + ']"]');
-                    if (targetEl) {
-                        var group = targetEl.closest('.form-group');
-                        if (group) {
-                            group.style.display = shouldShow ? '' : 'none';
+                    fieldName = fieldName.trim();
+                    if (!fieldName) return;
+
+                    // Support CSS Selectors (.class, #id)
+                    if (fieldName.startsWith('.') || fieldName.startsWith('#')) {
+                        document.querySelectorAll(fieldName).forEach(function(el) {
+                            el.style.display = shouldShow ? '' : 'none';
+                        });
+                        return;
+                    }
+
+                    // Target Wrapper finden: Primär über Wrapper ID
+                    var targetWrapper = document.querySelector('div[id$="-' + fieldName + '"]');
+
+                        if (targetWrapper) {
+                            targetWrapper.style.display = shouldShow ? '' : 'none';
                         }
                     }
-                });
+                );
             }
 
             sourceInput.addEventListener('change', evaluate);

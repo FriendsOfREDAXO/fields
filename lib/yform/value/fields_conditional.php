@@ -57,11 +57,11 @@ class rex_yform_value_fields_conditional extends rex_yform_value_abstract
                 'operator' => [
                     'type' => 'choice',
                     'label' => rex_i18n::msg('fields_conditional_operator'),
-                    'choices' => '= (gleich),!= (ungleich),> (größer),< (kleiner),contains (enthält),empty (leer),!empty (nicht leer)',
+                    'choices' => '==gleich (=),!=ungleich (!=),>größer (>),<kleiner (<),contains=enthält (contains),empty=leer (empty),!empty=nicht leer (!empty)',
                     'default' => '=',
                 ],
                 'compare_value' => ['type' => 'text', 'label' => rex_i18n::msg('fields_conditional_value')],
-                'target_fields' => ['type' => 'text', 'label' => 'Zielfelder (kommagetrennt)'],
+                'target_fields' => ['type' => 'text', 'label' => 'Zielfelder (kommagetrennt) oder CSS-Selector (.class, #id)', 'notice' => 'Feldnamen oder CSS-Selektoren (z.B. .my-class) angeben.'],
                 'action' => [
                     'type' => 'choice',
                     'label' => rex_i18n::msg('fields_conditional_action'),

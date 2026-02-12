@@ -130,9 +130,11 @@ Die IBAN-Validierung über openIBAN.com erfolgt live im Backend-Formular. Der AP
 Das Conditional-Feld benötigt keine Frontend-Ausgabe – es steuert nur die Sichtbarkeit von Feldern im Backend:
 
 - **Quellfeld**: Das Feld, dessen Wert geprüft wird
-- **Operator**: `=`, `!=`, `>`, `<`, `contains`, `empty`, `!empty`
+- **Operator**: `==`, `!=`, `>`, `<`, `contains`, `empty`, `!empty`
 - **Vergleichswert**: Der erwartete Wert
-- **Zielfelder**: Kommagetrennte Liste von Feldnamen
+- **Zielfelder**: Kommagetrennte Liste von Feldnamen ODER CSS-Selektoren
+  - *Beispiel Feldnamen:* `street,city` (sucht nach Feldern oder Wrapper-IDs wie `*-city`)
+  - *Beispiel CSS-Selektor:* `.my-group,#special-section` (blendet beliebige Elemente ein/aus)
 - **Aktion**: `show` oder `hide`
 
 ### Icon Picker
@@ -269,7 +271,6 @@ Erstellt mit Unterstützung von GitHub Copilot (Claude)
 
 - OpeningHoursHelper inspiriert durch [Template Manager](https://github.com/FriendsOfREDAXO/template_manager) von [Thomas Skerbis](https://github.com/skerbis)
 - IBAN-Validierung über [openIBAN.com](https://openiban.com) (kostenloser Dienst)
-- QR-Code-Generierung in reinem PHP ohne externe Abhängigkeiten
 
 ## Lizenz
 
