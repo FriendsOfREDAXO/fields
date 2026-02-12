@@ -1,6 +1,6 @@
 # Fields – Erweiterte redaktionelle YForm-Feldtypen für REDAXO
 
-![REDAXO](https://img.shields.io/badge/REDAXO-%3E%3D5.17-red) ![YForm](https://img.shields.io/badge/YForm-%3E%3D4.0-blue) ![PHP](https://img.shields.io/badge/PHP-%3E%3D8.1-purple)
+![REDAXO](https://img.shields.io/badge/REDAXO-%3E%3D5.17-red) ![YForm](https://img.shields.io/badge/YForm-%3E%3D5.0-blue) ![PHP](https://img.shields.io/badge/PHP-%3E%3D8.1-purple)
 
 Das AddOn **Fields** stellt 8 zusätzliche YForm-Value-Feldtypen bereit, die häufig benötigte Eingabemuster abdecken – von Social-Media-Profilen über Öffnungszeiten bis hin zu FAQ-Akkordeons mit Schema.org-Unterstützung.
 
