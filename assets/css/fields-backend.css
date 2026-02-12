@@ -254,3 +254,54 @@
     height: 0;
     overflow: hidden;
 }
+
+/* ============================================================
+   Star Rating
+   ============================================================ */
+
+.fields-rating-container {
+    display: block;
+    padding: 5px 0;
+}
+
+.fields-rating-group {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    border: none;
+    vertical-align: middle;
+}
+
+/* Hide Radio Inputs */
+.fields-rating-group input {
+    display: none;
+}
+
+/* Stars (Labels) */
+.fields-rating-group label {
+    font-size: 30px;
+    color: #ddd;
+    cursor: pointer;
+    line-height: 1;
+    margin: 0 2px;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.fields-rating-group label:before {
+    content: '★'; 
+}
+
+/* Hover & Checked States */
+.fields-rating-group input:checked ~ label,
+.fields-rating-group label:hover,
+.fields-rating-group label:hover ~ label {
+    color: #ffc107;
+    text-shadow: 0 0 2px rgba(0,0,0,0.1);
+}
+
+.fields-rating-container .text-muted {
+    font-size: 14px;
+    margin-left: 10px;
+    vertical-align: middle;
+    font-weight: bold;
+}
