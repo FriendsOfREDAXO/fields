@@ -11,6 +11,7 @@ if (!is_string($value) || $value === '') {
         'caption' => '',
         'has_header_row' => true,
         'has_header_col' => false,
+        'cols' => [], // { type: 'text'|'number' }
         'rows' => [
             ['Spalte 1', 'Spalte 2', 'Spalte 3'],
             ['', '', '']
@@ -18,6 +19,10 @@ if (!is_string($value) || $value === '') {
     ];
 } else {
     $data = json_decode($value, true);
+    // Migration: Falls cols noch nicht existiert
+    if (!isset($data['cols']) && isset($data['rows'][0])) {
+        $data['cols'] = array_fill(0, count($data['rows'][0]), ['type' => 'text']);
+    }
 }
 
 $id = $this->getFieldId();
@@ -79,5 +84,8 @@ $notice = $this->getElement('notice');
 </div>
 
 <script type="template" id="<?= $id ?>_data">
-    <?= json_encode($data['rows'] ?? []) ?>
+    <?= json_encode([
+        'rows' => $data['rows'] ?? [],
+        'cols' => $data['cols'] ?? []
+    ]) ?>
 </script>
