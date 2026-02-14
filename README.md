@@ -9,7 +9,7 @@ Das AddOn **Fields** stellt 8 zusätzliche YForm-Value-Feldtypen bereit, die hä
 - **Social Web** – Repeater für Social-Media-Profile mit 24 vordefinierten Plattformen (Font Awesome & UIkit Icons)
 - **Öffnungszeiten** – Wochentags-Editor mit Zeitfenstern, Sondertagen und Notizen
 - **Kontakte** – Flexible Kontaktkarten mit konfigurierbaren optionalen Feldern (Avatar, Firma, Adresse, etc.)
-- **Tabelle** – Barrierefreier Tabelleneditor mit flexiblen Spalten/Zeilen, Min/Max-Constraints und unabhängiger Ausrichtung für Kopf und Daten
+- **Tabelle** – Barrierefreier Tabelleneditor mit flexiblen Spalten/Zeilen, Min/Max-Constraints und erweiterten Datentypen (Medien, Links, Textarea)
 - **IBAN** – IBAN-Eingabe mit Live-Validierung über openIBAN.com (serverseitig geproxied)
 - **FAQ** – Frage/Antwort-Repeater mit automatischer Schema.org FAQPage JSON-LD Ausgabe
 - **Conditional** – Bedingte Feldgruppen (Felder ein-/ausblenden basierend auf anderen Feldwerten)
@@ -108,6 +108,11 @@ echo $fragment->parse('fields/bootstrap3/table.php');
 - Unabhängige **Textausrichtung** für Kopf- und Datenzellen (Links, Mitte, Rechts/Zahl)
 - **Inline-Hinzufügen** von Zeilen und Spalten mitten in der Tabelle
 - Strict Mode für Kopfzeilen/spalten (zwingend an/aus oder optional)
+- **Erweiterte Datentypen (Optional aktivierbar):**
+  - **Medien:** Integration des Medienpools (REX_MEDIA)
+  - **Links:** Integration der Linkmap (REX_LINK)
+  - **Mehrzeiliger Text:** Textarea für umfangreichere Inhalte
+  - **Zahlen:** Automatisch rechtsbündig formatiert
 
 ### Kontakte
 

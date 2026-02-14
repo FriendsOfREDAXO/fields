@@ -36,6 +36,9 @@ $minRows = (int)($this->getElement('min_rows') ?: 1);
 $maxRows = (int)($this->getElement('max_rows') ?: 999);
 $headerRowPolicy = $this->getElement('header_row_policy') ?: 'user'; // user, yes, no
 $headerColPolicy = $this->getElement('header_col_policy') ?: 'user'; // user, yes, no
+$enableMedia = (bool)$this->getElement('enable_media');
+$enableLink = (bool)$this->getElement('enable_link');
+$enableTextarea = (bool)$this->getElement('enable_textarea');
 
 // Enforce Policies in Initial Data (if new/empty or forced)
 if ($headerRowPolicy === 'yes') $data['has_header_row'] = true;
@@ -50,8 +53,12 @@ $config = [
     'minRows' => $minRows,
     'maxRows' => $maxRows,
     'headerRowPolicy' => $headerRowPolicy, // user, yes, no
-    'headerColPolicy' => $headerColPolicy  // user, yes, no
+    'headerColPolicy' => $headerColPolicy,  // user, yes, no
+    'enableMedia' => $enableMedia,
+    'enableLink' => $enableLink,
+    'enableTextarea' => $enableTextarea
 ];
+
 
 ?>
 <div class="<?= $this->getHTMLClass() ?> fields-table-wrapper" id="<?= $this->getHTMLId() ?>" data-fields-table>

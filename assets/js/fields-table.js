@@ -21,7 +21,9 @@
                 minCols: 1, maxCols: 999,
                 minRows: 1, maxRows: 999,
                 headerRowPolicy: 'user',
-                headerColPolicy: 'user'
+                headerColPolicy: 'user',
+                enableMedia: false,
+                enableLink: false
             };
 
             function getBoolConfig(name) {
@@ -57,6 +59,24 @@
                 if(!c.header_type) c.header_type = c.type || 'text';
             });
             updateHidden();
+
+            function getIconForType(type) {
+                if (type === 'number') return 'fa-hashtag';
+                if (type === 'center') return 'fa-align-center';
+                if (type === 'media') return 'fa-file-o';
+                if (type === 'link') return 'rex-icon-open-linkmap';
+                if (type === 'textarea') return 'fa-paragraph';
+                return 'fa-font';
+            }
+
+            function getTextForType(type) {
+                if (type === 'number') return 'Zahl';
+                if (type === 'center') return 'Zentriert';
+                if (type === 'media') return 'Medien';
+                if (type === 'link') return 'Link';
+                if (type === 'textarea') return 'Mehrzeilig';
+                return 'Text';
+            }
 
             function render() {
                 var thead = table.querySelector('thead');
@@ -95,7 +115,9 @@
                     headerTypeBtn.type = 'button';
                     headerTypeBtn.className = 'btn btn-default btn-xs fields-table-header-type';
                     headerTypeBtn.dataset.col = colIndex;
-                    headerTypeBtn.style.opacity = '0.8';
+                    headerTypeBtn.style.opacity = '1';
+                    headerTypeBtn.style.backgroundColor = '#dfe9f5'; // Light blue background like headers often have
+                    headerTypeBtn.style.color = '#333';
                     
                     var hIcon = 'fa-align-left';
                     var hTitle = 'Kopf: Text (links)';
@@ -111,10 +133,8 @@
                     typeBtn.className = 'btn btn-default btn-xs fields-table-col-type';
                     typeBtn.dataset.col = colIndex;
                     
-                    var iconClass = 'fa-align-left';
-                    var titleText = 'Daten: Text (links)';
-                    if (col.type === 'center') { iconClass = 'fa-align-center'; titleText = 'Daten: Zentriert'; }
-                    else if (col.type === 'number') { iconClass = 'fa-sort-numeric-asc'; titleText = 'Daten: Zahl (rechts)'; }
+                    var iconClass = getIconForType(col.type);
+                    var titleText = getTextForType(col.type);
 
                     typeBtn.title = titleText;
                     typeBtn.innerHTML = '<i class="rex-icon ' + iconClass + '"></i>';
@@ -163,15 +183,28 @@
                             cellEl.classList.add('fields-is-header');
                         }
                         var colDef = state.cols[colIndex] || {type: 'text'};
+                        var isBodyCell = !(rowIndex === 0 && state.has_header_row);
                         
                         // Wrapper for Input + Actions
                         var wrapperDiv = document.createElement('div');
                         wrapperDiv.className = 'fields-table-cell-wrapper';
                         
-                        // Input Field
-                        var input = document.createElement('input');
-                        input.type = 'text';
-                        input.className = 'form-control input-sm';
+                        // Input Field or TextArea
+                        var input;
+                        if (isBodyCell && colDef.type === 'textarea') {
+                            input = document.createElement('textarea');
+                            input.className = 'form-control'; // No input-sm for textarea usually
+                            input.style.fontSize = '12px'; // Match input-sm roughly
+                            input.style.padding = '5px 10px';
+                            input.rows = 1; // Start small
+                            input.style.resize = 'vertical';
+                            input.style.minHeight = '30px';
+                            // Auto-resize could be nice but let's stick to simple resize
+                        } else {
+                            input = document.createElement('input');
+                            input.type = 'text';
+                            input.className = 'form-control input-sm';
+                        }
                         
                         // Align Logic
                         if (rowIndex === 0 && state.has_header_row) {
@@ -186,13 +219,164 @@
                              else if (colDef.type === 'number') input.style.textAlign = 'right';
                              else input.style.textAlign = 'left';
                         }
+                        
+                        // MEDIA / LINK HANDLER
+                        // Wenn wir NICHT im Header sind (Header ist immer Text), und der Typ Media/Link ist
+                        
+                        if (isBodyCell && (colDef.type === 'media' || colDef.type === 'link')) {
+                             input.type = 'hidden'; // Base input is hidden
+                             
+                             var widgetGroup = document.createElement('div');
+                             widgetGroup.className = 'input-group input-group-xs';
+                             
+                             var displayInput = document.createElement('input');
+                             displayInput.type = 'text';
+                             displayInput.className = 'form-control';
+                             displayInput.readOnly = true;
+                             displayInput.value = cell;
+                             
+                             var btnSpan = document.createElement('span');
+                             btnSpan.className = 'input-group-btn';
+                             
+                             if (colDef.type === 'media') {
+                                 // Media Buttons
+                                 // Open
+                                 var btnOpen = document.createElement('a');
+                                 btnOpen.href = '#';
+                                 btnOpen.className = 'btn btn-popup';
+                                 btnOpen.innerHTML = '<i class="rex-icon rex-icon-open-mediapool"></i>';
+                                 btnOpen.title = 'Medienpool öffnen';
+                                 btnOpen.onclick = function(e){
+                                     e.preventDefault();
+                                     // Wir simulieren ein REX_MEDIA Widget
+                                     // Dazu nutzen wir den REDAXO Media Pool Popup mit Callback
+                                     // Callback muss global sein oder? 
+                                     // Besser: Wir nutzen rex.mediapool.open
+                                     // Aber wie bekommen wir den Wert zurück?
+                                     // REDAXO expects an ID to fill REX_MEDIA_x input.
+                                     // We can generate a fake random ID for this cell, put the hidden input there?
+                                     
+                                     // Problem: REDAXO JS uses global IDs.
+                                     // Hack: Create a unique ID for this cell input
+                                 };
+                                 
+                                 // We need to implement a specialized media select without globals if possible,
+                                 // OR use standard REDAXO logic by giving a unique ID to input.
+                                 // Unique ID: fields_table_MEDIA_row_col_random
+                                 var uniqueId = 'FT_MEDIA_' + rowIndex + '_' + colIndex + '_' + Math.floor(Math.random()*10000);
+                                 input.id = 'REX_MEDIA_' + uniqueId; // REDAXO Standard ID Pattern
+                                 displayInput.id = 'REX_MEDIA_' + uniqueId + '_NAME_MOCKED'; // Just for display? No, REDAXO fills REX_MEDIA_ID
+                                 
+                                 // Wait, standard REX_MEDIA widget:
+                                 // input type=text id=REX_MEDIA_1 readonly value=filename
+                                 // buttons call openREXMedia(1)
+                                 
+                                 // So we just need to assign input.id = REX_MEDIA_{UID}
+                                 // And input.type = text (readonly)
+                                 input.type = 'text';
+                                 input.readOnly = true;
+                                 input.id = 'REX_MEDIA_' + uniqueId;
+                                 
+                                 // Replace displayInput with our real input
+                                 displayInput = input; 
+                                 
+                                 btnOpen.onclick = function(e) {
+                                     e.preventDefault();
+                                     openREXMedia(uniqueId);
+                                     return false;
+                                 };
+
+                                 var btnAdd = document.createElement('a');
+                                 btnAdd.href = '#';
+                                 btnAdd.className = 'btn btn-popup';
+                                 btnAdd.innerHTML = '<i class="rex-icon rex-icon-add-media"></i>';
+                                 btnAdd.onclick = function(e) { e.preventDefault(); addREXMedia(uniqueId); return false; };
+
+                                 var btnDel = document.createElement('a');
+                                 btnDel.href = '#';
+                                 btnDel.className = 'btn btn-popup';
+                                 btnDel.innerHTML = '<i class="rex-icon rex-icon-delete-media"></i>';
+                                 btnDel.onclick = function(e) { e.preventDefault(); deleteREXMedia(uniqueId); return false; };
+
+                                 var btnView = document.createElement('a');
+                                 btnView.href = '#';
+                                 btnView.className = 'btn btn-popup';
+                                 btnView.innerHTML = '<i class="rex-icon rex-icon-view-media"></i>';
+                                 btnView.onclick = function(e) { e.preventDefault(); viewREXMedia(uniqueId); return false; };
+
+                                 btnSpan.appendChild(btnOpen);
+                                 btnSpan.appendChild(btnAdd);
+                                 btnSpan.appendChild(btnDel);
+                                 btnSpan.appendChild(btnView);
+                             } 
+                             else if (colDef.type === 'link') {
+                                 // Link Buttons
+                                 var uniqueId = 'FT_LINK_' + rowIndex + '_' + colIndex + '_' + Math.floor(Math.random()*10000);
+                                 input.type = 'hidden';
+                                 input.id = 'LINK_' + uniqueId; // REDAXO Link ID pattern usually uses just ID?
+                                 // openLinkMap('LINK_1', '&clang=1&category_id=1');
+                                 // input needs to be hidden, and a name input shown
+                                 
+                                 // For Linkmap, it usually updates input #LINK_{ID} with ID and #LINK_{ID}_NAME with name
+                                 displayInput.id = 'LINK_' + uniqueId + '_NAME';
+                                 
+                                 var btnOpen = document.createElement('a');
+                                 btnOpen.href = '#';
+                                 btnOpen.className = 'btn btn-popup';
+                                 btnOpen.innerHTML = '<i class="rex-icon rex-icon-open-linkmap"></i>';
+                                 btnOpen.onclick = function(e) {
+                                     e.preventDefault();
+                                     openLinkMap('LINK_' + uniqueId, ''); 
+                                     return false;
+                                 };
+
+                                 var btnDel = document.createElement('a');
+                                 btnDel.href = '#';
+                                 btnDel.className = 'btn btn-popup';
+                                 btnDel.innerHTML = '<i class="rex-icon rex-icon-delete-link"></i>';
+                                 btnDel.onclick = function(e) {
+                                     e.preventDefault();
+                                     deleteREXLink(uniqueId);
+                                     return false;
+                                 };
+                                 
+                                 btnSpan.appendChild(btnOpen);
+                                 btnSpan.appendChild(btnDel);
+                                 
+                                 // Link Value synchronizer:
+                                 // When popup closes, it updates the DOM inputs. 
+                                 // We need to catch that update to update state.rows.
+                                 // MutationObserver on input?
+                             }
+
+                             widgetGroup.appendChild(displayInput);
+                             if (colDef.type === 'link') {
+                                 widgetGroup.appendChild(input); // Hidden ID input
+                             }
+                             widgetGroup.appendChild(btnSpan);
+                             
+                             // Replace direct input with widget
+                             // But we need to sync value changes from REDAXO to state
+                             // Standard input events might not trigger when REDAXO JS changes value programmatically?
+                             // Yes, we need specific listener/observer or poll.
+                             // Let's use $(input).change() since REDAXO usually triggers change? Hopefully.
+                             
+                             wrapperDiv.appendChild(widgetGroup);
+                             
+                             // Add Observer because REDAXO legacy JS often doesn't trigger proper events
+                             // Observe 'value' attribute or property changes?
+                             // REDAXO JS: $(..).val(id);
+                        } else {
+                             // Standard Text Input
+                             wrapperDiv.appendChild(input); 
+                        }
 
                         input.value = cell;
                         input.dataset.row = rowIndex;
                         input.dataset.col = colIndex;
-
                         
-                        // Actions (Add Row & Del Row)
+                        // Action buttons logic remains same...
+                        // ...
                         var actionsHtml = '';
                         if (colIndex === row.length - 1) {
                              // Add Row Inline (Insert after)
@@ -205,7 +389,7 @@
                              }
                         }
 
-                        wrapperDiv.appendChild(input);
+                        // wrapperDiv.appendChild(input); // Removed duplicate append
                         
                         if(actionsHtml) {
                              var actionsDiv = document.createElement('div');
@@ -250,6 +434,38 @@
                     updateHidden();
                 }
             });
+
+            // Mutation Observer to catch REDAXO Media/Link Changes
+            // Since REDAXO scripts update the Input Value property, input event might not fire
+            var observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'value') {
+                         // This catches attribute changes, but jQuery.val() changes property?
+                    }
+                });
+            });
+            // Better: use setInterval check or hijack triggered events.
+            // REDAXO standard popups usually don't trigger native 'input'
+            // We can attach a 'change' listener and hope native JS or jQuery triggers it.
+            // Also RE-attach listeners to dynamic inputs created in render()
+            
+            // Actually, we can just use $(wrapper).on('change', 'input', ...) via jQuery if available, 
+            // as REDAXO uses jQuery trigger('change').
+            if (typeof jQuery !== 'undefined') {
+                jQuery(wrapper).on('change', 'input[data-row]', function(e) {
+                     var r = this.dataset.row;
+                     var c = this.dataset.col;
+                     state.rows[r][c] = this.value;
+                     updateHidden();
+                     
+                     // If link name field changed, we might want to store display name? 
+                     // Currently fields_table just stores one value per cell.
+                     // For links: ID. For Media: Filename.
+                     // The Link Widget has a separate ID input and Name Input. 
+                     // We only bind data-row to the ID input (hidden).
+                });
+            }
+
 
             // Config Checkboxes & Caption
             wrapper.addEventListener('change', function(e) {
@@ -306,19 +522,29 @@
                     return;
                 }
 
-                // Toggle Body Type
-                var typeBtn = e.target.closest('.fields-table-col-type');
-                if(typeBtn) {
-                    var c = parseInt(typeBtn.dataset.col);
-                    var currentType = state.cols[c].type || 'text';
+
+                // Toggle Body Type (Config Button in Header)
+                if(e.target.closest('.fields-table-col-type')) {
+                    var btn = e.target.closest('.fields-table-col-type');
+                    var c = parseInt(btn.dataset.col);
                     
-                    if (currentType === 'text') state.cols[c].type = 'center';
-                    else if (currentType === 'center') state.cols[c].type = 'number';
-                    else state.cols[c].type = 'text';
+                    // Build active types list based on config and state
+                    var types = ['text', 'number', 'center'];
+                    if (config.enableMedia) types.push('media');
+                    if (config.enableLink) types.push('link');
+                    
+                    var current = state.cols[c].type || 'text';
+                    var idx = types.indexOf(current);
+                    if (idx === -1) idx = 0; // Fallback
+                    
+                    var next = types[(idx + 1) % types.length];
+                    state.cols[c].type = next;
 
                     render();
                     return;
                 }
+
+
 
                 // Add Col Inline
                 var addColInlineBtn = e.target.closest('.fields-table-add-col-inline');

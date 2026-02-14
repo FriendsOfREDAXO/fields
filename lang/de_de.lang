@@ -86,7 +86,34 @@ fields_iban_bic = BIC
 fields_iban_proxy_enabled = IBAN-Proxy aktiviert
 fields_iban_proxy_notice = Die Validierung wird über den eigenen Server als Proxy durchgeführt
 
-# FAQ Repeater
+
+# Table Editor
+fields_table_caption = Tabellen-Überschrift (Caption)
+fields_table_columns = Spalten
+fields_table_rows = Zeilen
+fields_table_add_row = Zeile anfügen
+fields_table_add_col = Spalte anfügen
+fields_table_settings = Einstellungen
+fields_table_header_row = Kopfzeile
+fields_table_header_col = Kopfspalte
+fields_table_min_rows_reached = Minimum an Zeilen erreicht
+fields_table_max_rows_reached = Maximum an Zeilen erreicht
+fields_table_min_cols_reached = Minimum an Spalten erreicht
+fields_table_max_cols_reached = Maximum an Spalten erreicht
+fields_table_type_text = Text (Links)
+fields_table_type_number = Zahl (Rechts)
+fields_table_type_center = Zentriert
+fields_table_type_media = Medien (REX_MEDIA)
+fields_table_type_link = Link (REX_LINK)
+fields_table_media_select = Medium auswählen
+fields_table_settings_row_policy = Kopfzeile
+fields_table_settings_col_policy = Kopfspalte
+fields_table_settings_enable_media = Medientyp erlauben?
+fields_table_settings_enable_link = Linktyp erlauben?
+
+
+fields_table_link_select = Link auswählen
+
 fields_faq = FAQ
 fields_faq_description = Fragen und Antworten mit Schema.org Unterstützung
 fields_faq_question = Frage
