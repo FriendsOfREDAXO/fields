@@ -587,6 +587,7 @@ body.rex-theme-dark .fields-table-editor .fields-is-header input.form-control {
     border-radius: 3px;
     border: 1px solid transparent;
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 .fields-inline-edit:hover {
     background: rgba(0,0,0,0.05);

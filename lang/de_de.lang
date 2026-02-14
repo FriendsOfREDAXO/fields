@@ -165,3 +165,10 @@ fields_config_icons_fa = Font Awesome Icons
 fields_config_icons_fa_notice = Kommaseparierte Liste der verfügbaren Icons (z.B. fa-home, fa-user). Leer lassen für Standard.
 fields_config_icons_uikit = UIkit Icons
 fields_config_icons_uikit_notice = Kommaseparierte Liste der verfügbaren Icons (z.B. home, user). Leer lassen für Standard.
+
+# Inline Edit Number
+fields_inline_number_description = Inline Edit Number Field
+fields_inline_number_prefix = Präfix
+fields_inline_number_suffix = Suffix
+fields_inline_number_prefix_notice = Text vor dem Eingabefeld (z.B. €)
+fields_inline_number_suffix_notice = Text nach dem Eingabefeld (z.B. km)

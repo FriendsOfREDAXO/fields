@@ -126,7 +126,12 @@
             input.className = 'form-control';
         } else {
             input = document.createElement('input');
-            input.type = 'text';
+            // Allow common types, default to text
+            if (['number', 'email', 'date', 'datetime-local'].indexOf(type) !== -1) {
+                input.type = type;
+            } else {
+                input.type = 'text';
+            }
             input.className = 'form-control input-sm'; // small input for lists
         }
         
@@ -251,10 +256,32 @@
             if (json.success) {
                 // Update View
                 var view = el.querySelector('.fields-inline-view');
-                view.textContent = newValue; // simple text update
-                // If empty, show placeholder?
+                
+                // Get Prefix/Suffix
+                var prefix = el.dataset.prefix;
+                var suffix = el.dataset.suffix;
+                
                 if (newValue.trim() === '') {
                     view.innerHTML = '&nbsp;<i class="rex-icon fa-pencil" style="opacity:0.3"></i>&nbsp;';
+                } else {
+                    view.innerHTML = '';
+                    if (prefix) {
+                        var pSpan = document.createElement('span');
+                        pSpan.className = 'fields-inline-prefix';
+                        pSpan.textContent = prefix;
+                        view.appendChild(pSpan);
+                        view.appendChild(document.createTextNode(' '));
+                    }
+                    
+                    view.appendChild(document.createTextNode(newValue));
+                    
+                    if (suffix) {
+                        view.appendChild(document.createTextNode(' '));
+                        var sSpan = document.createElement('span');
+                        sSpan.className = 'fields-inline-suffix';
+                        sSpan.textContent = suffix;
+                        view.appendChild(sSpan);
+                    }
                 }
                 
                 // Update dataset raw value

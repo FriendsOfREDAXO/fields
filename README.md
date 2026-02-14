@@ -8,7 +8,8 @@ Das AddOn **Fields** stellt eine umfangreiche Sammlung zusätzlicher YForm-Value
 
 ### Spezielle Eingabetypen (UI Controls)
 - **Inline Switch** – Moderner, eckiger Toggle-Switch für Boolean-Werte (Liste & Formular)
-- **Inline Edit** – Direktes Bearbeiten von Text/Textarea-Feldern in der YForm-Listenansicht (Click-to-Edit)
+- **Inline Edit** – Direktes Bearbeiten von Text- und Textarea-Feldern in der YForm-Listenansicht (Click-to-Edit)
+- **Inline Number** – Zahlenfeld mit Inline-Editing, Präfix/Suffix (z.B. €/km), Min/Max und Step-Optionen
 - **Icon Picker** – Icon-Auswahl aus Font Awesome und/oder UIkit-Iconsets
 - **Star Rating** – Bewertungsfeld (1-10 Sterne) mit visueller Eingabe
 - **IBAN** – IBAN-Eingabe mit Live-Validierung über openIBAN.com (serverseitig geproxied)
@@ -60,6 +61,7 @@ Die Feldtypen erscheinen nach der Installation automatisch in der YForm-Feldausw
 | `fields_rating` | `int` | Ganzzahlige Bewertung (Default 1-5 Sterne) |
 | `fields_inline_switch` | `tinyint(1)` | Boolescher Switch für Listen- & Formularansicht |
 | `fields_inline` | `text`, `mediumtext` | Text/Textarea mit Inline-Editing in der Liste |
+| `fields_inline_number` | `int`, `float`, `decimal` | Zahlenfeld mit Inline-Editing (Präfix/Suffix/Min/Max) |
 
 ## Frontend-Ausgabe mit Fragmenten
 
