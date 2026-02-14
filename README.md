@@ -13,6 +13,8 @@ Das AddOn **Fields** stellt 8 zusätzliche YForm-Value-Feldtypen bereit, die hä
 - **IBAN** – IBAN-Eingabe mit Live-Validierung über openIBAN.com (serverseitig geproxied)
 - **FAQ** – Frage/Antwort-Repeater mit automatischer Schema.org FAQPage JSON-LD Ausgabe
 - **Conditional** – Bedingte Feldgruppen (Felder ein-/ausblenden basierend auf anderen Feldwerten)
+- **Tabs & Akkordeons** – Gruppierung von Feldern in Tabs, Akkordeons oder Fieldsets
+- **Grid & Layout** – Mehrspaltige Anordnung von Feldern (Grid/Flexbox)
 - **Icon Picker** – Icon-Auswahl aus Font Awesome und/oder UIkit-Iconsets- **Star Rating** – Bewertungsfeld (1-10 Sterne) mit visueller Eingabe
 ## Installation
 
@@ -43,6 +45,8 @@ Die Feldtypen erscheinen nach der Installation automatisch in der YForm-Feldausw
 | `fields_iban` | `varchar(34)` | IBAN mit Validierung |
 | `fields_faq` | `mediumtext` | FAQ-Einträge als JSON |
 | `fields_conditional` | *kein DB-Feld* | Steuert Sichtbarkeit anderer Felder |
+| `fields_interactive` | *kein DB-Feld* | Formularfelder in Tabs/Akkordeons gruppieren |
+| `fields_structure` | *kein DB-Feld* | Formularfelder mehrspaltig anordnen (Grid) |
 | `fields_icon_picker` | `varchar(191)` | Ausgewähltes Icon (z.B. `fa-home`) |
 | `fields_rating` | `int` | Ganzzahlige Bewertung (Default 1-5 Sterne) |
 
@@ -160,6 +164,36 @@ Das Conditional-Feld benötigt keine Frontend-Ausgabe – es steuert nur die Sic
   - *Beispiel Feldnamen:* `street,city` (sucht nach Feldern oder Wrapper-IDs wie `*-city`)
   - *Beispiel CSS-Selektor:* `.my-group,#special-section` (blendet beliebige Elemente ein/aus)
 - **Aktion**: `show` oder `hide`
+
+### Tabs & Akkordeons (Interaktiv)
+
+Mit `fields_interactive` lassen sich Formularfelder im Backend gruppieren, um Übersichtlichkeit zu schaffen:
+
+- **Tabs**: Mehrere Felder werden in Reitern dargestellt.
+- **Akkordeon**: Felder werden in aufklappbaren Bereichen organisiert.
+- **Fieldset**: Eine einfache Gruppierung mit Legende.
+
+**Verwendung:**
+1. Feld `fields_interactive` anlegen
+2. Typ wählen (z.B. Tab Start, Akkordeon Start oder Gruppe Ende)
+3. Gleiche `Gruppen-ID` für zusammengehörige Elemente vergeben
+
+Beispielaufbau für 2 Tabs:
+1. `fields_interactive` (Typ: Tab, Label: "Basisdaten", Gruppen-ID: 1)
+2. ... Felder für Tab 1 ...
+3. `fields_interactive` (Typ: Tab, Label: "Erweitert", Gruppen-ID: 1)
+4. ... Felder für Tab 2 ...
+5. `fields_interactive` (Typ: Ende, Gruppen-ID: 1)
+
+### Grid & Layout (Struktur)
+
+`fields_structure` ermöglicht die mehrspaltige Anordnung von Feldern mittels CSS Grid.
+
+- **Start**: Beginnt einen Grid-Container.
+- **Layout**: Definition der Spalten (z.B. `1fr 1fr` für 50/50, `1fr 2fr` für 1/3 zu 2/3).
+- **Gap**: Abstand zwischen den Spalten.
+
+Alle Felder zwischen "Start" und "Ende" (oder dem nächsten "Start") werden in das Grid aufgenommen.
 
 ### Icon Picker
 
