@@ -59,6 +59,7 @@ Die Feldtypen erscheinen nach der Installation automatisch in der YForm-Feldausw
 | `fields_icon_picker` | `varchar(191)` | Ausgewähltes Icon (z.B. `fa-home`) |
 | `fields_rating` | `int` | Ganzzahlige Bewertung (Default 1-5 Sterne) |
 | `fields_inline_switch` | `tinyint(1)` | Boolescher Switch für Listen- & Formularansicht |
+| `fields_inline` | `text`, `mediumtext` | Text/Textarea mit Inline-Editing in der Liste |
 
 ## Frontend-Ausgabe mit Fragmenten
 
