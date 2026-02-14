@@ -15,6 +15,7 @@ Das AddOn **Fields** stellt eine umfangreiche Sammlung zusätzlicher YForm-Value
 - **Conditional** – Bedingte Feldgruppen (Felder ein-/ausblenden basierend auf anderen Feldwerten)
 - **Tabs & Akkordeons** – Gruppierung von Feldern in Tabs, Akkordeons oder Fieldsets
 - **Grid & Layout** – Mehrspaltige Anordnung von Feldern (Grid/Flexbox)
+- **Inline Edit** – Direktes Bearbeiten von Text/Textarea-Feldern in der YForm-Listenansicht (Click-to-Edit)
 - **Icon Picker** – Icon-Auswahl aus Font Awesome und/oder UIkit-Iconsets- **Star Rating** – Bewertungsfeld (1-10 Sterne) mit visueller Eingabe
 ## Installation
 
@@ -327,6 +328,20 @@ Alle komplexen Felder speichern ihre Daten als JSON. Beispiele:
 }
 ```
 </details>
+
+## Inline Editing (Listenansicht)
+
+Mit dem Feldtyp `fields_inline` können Text- und Textarea-Felder in der YForm-Tabellenübersicht direkt bearbeitet werden.
+
+### Einrichtung
+1. Im Table Manager den Datentyp des gwünschten Feldes auf `fields_inline` setzen.
+2. In den Optionen wählen, ob es sich um ein einzeiliges Textfeld oder eine Textarea handelt.
+
+### Features
+- **Click-to-Edit**: Anklicken aktiviert den Bearbeitungsmodus.
+- **Speichern**: Enter (bei Textfeldern) oder Klick auf den Haken.
+- **Abbruch**: ESC oder Klick auf das X.
+- **Events**: Löst beim Speichern die Standard YForm-Events (`YFORM_DATA_UPDATED`) aus, sodass andere AddOns (z.B. URL AddOn) Änderungen registrieren.
 
 ## Unterstützte Plattformen (Social Web)
 
