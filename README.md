@@ -6,18 +6,25 @@ Das AddOn **Fields** stellt eine umfangreiche Sammlung zusätzlicher YForm-Value
 
 ## Funktionen
 
-- **Social Web** – Repeater für Social-Media-Profile mit 24 vordefinierten Plattformen (Font Awesome & UIkit Icons)
+### Spezielle Eingabetypen (UI Controls)
+- **Inline Switch** – Moderner, eckiger Toggle-Switch für Boolean-Werte (Liste & Formular)
+- **Inline Edit** – Direktes Bearbeiten von Text/Textarea-Feldern in der YForm-Listenansicht (Click-to-Edit)
+- **Icon Picker** – Icon-Auswahl aus Font Awesome und/oder UIkit-Iconsets
+- **Star Rating** – Bewertungsfeld (1-10 Sterne) mit visueller Eingabe
+- **IBAN** – IBAN-Eingabe mit Live-Validierung über openIBAN.com (serverseitig geproxied)
+
+### Komplexe Datentypen (Repeater & Strukturen)
+- **Tabelle** – Barrierefreier Tabelleneditor mit flexiblen Spalten/Zeilen, Min/Max-Constraints und erweiterten Datentypen (Medien, Links, Textarea)
+- **Social Web** – Repeater für Social-Media-Profile mit 24 vordefinierten Plattformen
 - **Öffnungszeiten** – Wochentags-Editor mit Zeitfenstern, Sondertagen und Notizen
 - **Kontakte** – Flexible Kontaktkarten mit konfigurierbaren optionalen Feldern (Avatar, Firma, Adresse, etc.)
-- **Tabelle** – Barrierefreier Tabelleneditor mit flexiblen Spalten/Zeilen, Min/Max-Constraints und erweiterten Datentypen (Medien, Links, Textarea)
-- **IBAN** – IBAN-Eingabe mit Live-Validierung über openIBAN.com (serverseitig geproxied)
 - **FAQ** – Frage/Antwort-Repeater mit automatischer Schema.org FAQPage JSON-LD Ausgabe
-- **Conditional** – Bedingte Feldgruppen (Felder ein-/ausblenden basierend auf anderen Feldwerten)
+
+### Layout & Logik
 - **Tabs & Akkordeons** – Gruppierung von Feldern in Tabs, Akkordeons oder Fieldsets
 - **Grid & Layout** – Mehrspaltige Anordnung von Feldern (Grid/Flexbox)
-- **Inline Edit** – Direktes Bearbeiten von Text/Textarea-Feldern in der YForm-Listenansicht (Click-to-Edit)
-- **Icon Picker** – Icon-Auswahl aus Font Awesome und/oder UIkit-Iconsets- **Star Rating** – Bewertungsfeld (1-10 Sterne) mit visueller Eingabe
-- **Inline Switch** – Moderner, eckiger Toggle-Switch für Boolean-Werte (Liste & Formular)
+- **Conditional** – Bedingte Feldgruppen (Felder ein-/ausblenden basierend auf anderen Feldwerten)
+
 ## Installation
 
 1. Im REDAXO-Installer nach **fields** suchen und installieren
