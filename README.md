@@ -17,6 +17,7 @@ Das AddOn **Fields** stellt eine umfangreiche Sammlung zusätzlicher YForm-Value
 - **Grid & Layout** – Mehrspaltige Anordnung von Feldern (Grid/Flexbox)
 - **Inline Edit** – Direktes Bearbeiten von Text/Textarea-Feldern in der YForm-Listenansicht (Click-to-Edit)
 - **Icon Picker** – Icon-Auswahl aus Font Awesome und/oder UIkit-Iconsets- **Star Rating** – Bewertungsfeld (1-10 Sterne) mit visueller Eingabe
+- **Inline Switch** – Moderner, eckiger Toggle-Switch für Boolean-Werte (Liste & Formular)
 ## Installation
 
 1. Im REDAXO-Installer nach **fields** suchen und installieren
@@ -50,6 +51,7 @@ Die Feldtypen erscheinen nach der Installation automatisch in der YForm-Feldausw
 | `fields_structure` | *kein DB-Feld* | Formularfelder mehrspaltig anordnen (Grid) |
 | `fields_icon_picker` | `varchar(191)` | Ausgewähltes Icon (z.B. `fa-home`) |
 | `fields_rating` | `int` | Ganzzahlige Bewertung (Default 1-5 Sterne) |
+| `fields_inline_switch` | `tinyint(1)` | Boolescher Switch für Listen- & Formularansicht |
 
 ## Frontend-Ausgabe mit Fragmenten
 

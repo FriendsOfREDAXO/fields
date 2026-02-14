@@ -574,108 +574,18 @@ body.rex-theme-dark .fields-table-editor .fields-is-header input.form-control {
     opacity: 1;
 }
 
-
-/* ============================================================
-   Inline Switch & Edit BASE STYLES 
-   (Must be present for the component to be visible!)
-   ============================================================ */
-
-.fields-inline-edit {
-    cursor: pointer;
-    min-height: 20px;
-    padding: 2px 5px;
-    border-radius: 3px;
-    border: 1px solid transparent;
-    transition: all 0.2s ease;
-}
-.fields-inline-edit:hover {
-    background: rgba(0,0,0,0.05);
-    border-color: rgba(0,0,0,0.1);
-}
-.fields-inline-edit.editing {
-    background: transparent;
-    border-color: transparent;
-    cursor: default;
-}
-.fields-inline-edit.saving {
-    opacity: 0.5;
-    pointer-events: none;
-}
-.fields-inline-edit.success-flash {
-    background-color: #dff0d8;
-    color: #3c763d;
-}
-
-/* Switch Toggle BASE */
-.fields-inline-switch {
-    width: 36px;
-    height: 20px;
-    background-color: #e6e6e6; /* Light gray base */
-    border-radius: 0 !important; /* <--- SQUARE (HARD) */
-    position: relative;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    display: inline-block;
-    vertical-align: middle;
-}
-.fields-inline-switch .fields-switch-slider {
-    width: 16px;
-    height: 16px;
-    background-color: #fff;
-    border-radius: 0 !important; /* <--- SQUARE (HARD) */
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    transition: left 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-.fields-inline-switch.fields-switch-active {
-    background-color: #5bb585; /* <--- NEW GREEN */
-}
-.fields-inline-switch.fields-switch-active .fields-switch-slider {
-    left: 18px;
-}
-.fields-inline-switch.loading {
-    opacity: 0.7;
-    cursor: wait;
-}
-
-/* Improve Dark Mode Colors for Switch (Explicit & Auto) */
-
-/* 1. Explicit Dark Mode Class */
+/* Improve Dark Mode Colors for Switch */
 body.rex-theme-dark .fields-inline-switch {
-    background-color: rgba(255, 255, 255, 0.15); /* Transparent Gray for Inactive */
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #2b3e50; /* Darker Slate */
+    border: 1px solid #455a64;
 }
 body.rex-theme-dark .fields-inline-switch .fields-switch-slider {
-    background-color: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    background-color: #b0bec5; /* Muted White/Grey */
 }
 body.rex-theme-dark .fields-inline-switch.fields-switch-active {
-    background-color: rgba(91, 181, 133, 0.8); /* #5bb585 with opacity */
-    border-color: transparent;
+    background-color: #2e7d32; /* Deep Green */
+    border-color: #2e7d32;
 }
 body.rex-theme-dark .fields-inline-switch.fields-switch-active .fields-switch-slider {
     background-color: #fff;
-    opacity: 1;
-}
-
-/* 2. Auto Dark Mode (Media Query) */
-@media (prefers-color-scheme: dark) { 
-    body.rex-has-theme:not(.rex-theme-light) .fields-inline-switch {
-        background-color: rgba(255, 255, 255, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    body.rex-has-theme:not(.rex-theme-light) .fields-inline-switch .fields-switch-slider {
-        background-color: rgba(255, 255, 255, 0.7);
-        box-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    }
-    body.rex-has-theme:not(.rex-theme-light) .fields-inline-switch.fields-switch-active {
-        background-color: rgba(91, 181, 133, 0.8);
-        border-color: transparent;
-    }
-    body.rex-has-theme:not(.rex-theme-light) .fields-inline-switch.fields-switch-active .fields-switch-slider {
-        background-color: #fff;
-        opacity: 1;
-    }
 }
