@@ -607,6 +607,24 @@ body.rex-theme-dark .fields-table-editor .fields-is-header input.form-control {
     color: #3c763d;
 }
 
+/* Inline Edit Input Sizing - Fix for narrow columns */
+.fields-inline-edit.editing {
+    /* Ensure container respects content */
+}
+
+.fields-inline-edit .fields-inline-input {
+    display: block;
+}
+
+.fields-inline-edit .input-group.fields-inline-group {
+    min-width: 140px; /* Ensure at least enough space for 5-6 digits and buttons */
+    width: 100%;
+}
+
+.fields-inline-edit input.form-control {
+    min-width: 80px; /* Ensure input part is usable */
+}
+
 /* Switch Toggle BASE */
 .fields-inline-switch {
     width: 36px;

@@ -261,6 +261,9 @@
                 var prefix = el.dataset.prefix;
                 var suffix = el.dataset.suffix;
                 
+                // Use formatted value if available, otherwise raw input
+                var displayValue = json.formatted !== undefined ? json.formatted : newValue;
+
                 if (newValue.trim() === '') {
                     view.innerHTML = '&nbsp;<i class="rex-icon fa-pencil" style="opacity:0.3"></i>&nbsp;';
                 } else {
@@ -273,7 +276,7 @@
                         view.appendChild(document.createTextNode(' '));
                     }
                     
-                    view.appendChild(document.createTextNode(newValue));
+                    view.appendChild(document.createTextNode(displayValue));
                     
                     if (suffix) {
                         view.appendChild(document.createTextNode(' '));
@@ -318,9 +321,16 @@
             });
 
             // Switch Toggle Click
-            $(document).on('click', '.fields-inline-switch', function(e) {
+            $(document).on('click', '.fields-inline-switch:not(.fields-form-switch)', function(e) {
                 e.preventDefault();
                 var wrapper = $(this);
+                // Check if it has required data attributes for inline edit
+                // The form version (fields-form-switch) does not have data-token
+                if (!wrapper.data('token')) {
+                    // This is likely a form switch or misconfigured
+                    return;
+                }
+                
                 if (!wrapper.hasClass('loading')) {
                     toggleSwitch(wrapper[0]);
                 }

@@ -59,8 +59,29 @@ class rex_api_fields_inline_update extends rex_api_function
         $dataSet->setValue($field, $value);
         
         if ($dataSet->save()) {
+             $newValue = $dataSet->getValue($field);
+             $formattedValue = $newValue;
+
+             // Try to format if it's a number field
+             $yformTable = \rex_yform_manager_table::get($table);
+             if ($yformTable) {
+                 $fieldDef = $yformTable->getValueField($field);
+                 if ($fieldDef && ($fieldDef->getTypeName() == 'fields_inline_number' || $fieldDef->getTypeName() == 'number')) {
+                     // Get Scale
+                     $scale = $fieldDef->getElement('scale');
+                     if (is_numeric($scale)) {
+                         $formattedValue = number_format((float)$newValue, (int)$scale, ',', '.');
+                     }
+                 }
+             }
+
              rex_response::cleanOutputBuffers();
-             rex_response::sendJson(['success' => true, 'id' => $id, 'value' => $dataSet->getValue($field)]);
+             rex_response::sendJson([
+                 'success' => true, 
+                 'id' => $id, 
+                 'value' => $newValue,
+                 'formatted' => $formattedValue
+             ]);
              exit;
         } else {
              rex_response::cleanOutputBuffers();
