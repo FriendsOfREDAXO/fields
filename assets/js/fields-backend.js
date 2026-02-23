@@ -831,12 +831,23 @@
             var sourceInput = null;
 
             if (sourceWrapper) {
-                sourceInput = sourceWrapper.querySelector('input, select, textarea');
+                // Checkbox/Radio bevorzugen – YForm rendert ein hidden input VOR der echten Checkbox,
+                // querySelector('input') würde sonst immer das hidden input (type=hidden, value=0) finden,
+                // das nie einen change-Event feuert und dessen Wert sich nie ändert.
+                sourceInput = sourceWrapper.querySelector('input[type=checkbox], input[type=radio]')
+                           || sourceWrapper.querySelector('select, textarea')
+                           || sourceWrapper.querySelector('input:not([type=hidden])')
+                           || sourceWrapper.querySelector('input');
             }
 
             // Fallback für Sonderfälle: Direktes Input-Match falls Wrapper nicht greifbar
             if (!sourceInput) {
                 sourceInput = document.querySelector('[name*="[' + sourceField + ']"]');
+                // Auch im Fallback Checkbox bevorzugen
+                if (sourceInput && sourceInput.type === 'hidden') {
+                    var betterInput = document.querySelector('[name*="[' + sourceField + ']"]:not([type=hidden])');
+                    if (betterInput) sourceInput = betterInput;
+                }
             }
 
             if (!sourceInput) return;
