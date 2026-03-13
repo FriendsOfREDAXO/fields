@@ -33,6 +33,7 @@ if (rex::isBackend() && rex::getUser()) {
     rex_view::addJsFile($addon->getAssetsUrl('js/fields-inline.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/fields-interactive.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/fields-structure.js'));
+    rex_view::addJsFile($addon->getAssetsUrl('js/fields-tagging.js'));
     
     $faIcons = $addon->getConfig('icons_fontawesome');
     $uikitIcons = $addon->getConfig('icons_uikit');

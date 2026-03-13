@@ -7,9 +7,9 @@
 
 $value ??= $this->getValue();
 $tags ??= [];
-$sourceTable ??= '';
-$sourceField ??= '';
-$maxTags ??= 0;
+$source_table ??= '';
+$source_field ??= '';
+$max_tags ??= 0;
 
 $notice = [];
 if ('' !== $this->getElement('notice')) {
@@ -28,7 +28,7 @@ $apiUrl = rex_url::backendController(['rex-api-call' => 'fields_tagging_suggest'
 <div class="<?= $classGroup ?>" id="<?= $this->getHTMLId() ?>">
     <label class="control-label" for="<?= $fieldId ?>"><?= $this->getLabel() ?></label>
 
-    <div class="fields-tagging" data-field-name="<?= rex_escape($fieldName) ?>" data-api-url="<?= rex_escape($apiUrl) ?>" data-source-table="<?= rex_escape((string) $sourceTable) ?>" data-source-field="<?= rex_escape((string) $sourceField) ?>" data-max-tags="<?= (int) $maxTags ?>">
+    <div class="fields-tagging" data-field-name="<?= rex_escape($fieldName) ?>" data-api-url="<?= rex_escape($apiUrl) ?>" data-source-table="<?= rex_escape((string) $source_table) ?>" data-source-field="<?= rex_escape((string) $source_field) ?>" data-max-tags="<?= (int) $max_tags ?>">
         <div class="fields-tagging-tags" aria-live="polite">
             <?php foreach ($tags as $tag): ?>
                 <span class="label label-primary fields-tagging-tag" data-tag="<?= rex_escape($tag) ?>">
