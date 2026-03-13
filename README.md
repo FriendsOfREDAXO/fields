@@ -13,6 +13,7 @@ Das AddOn **Fields** stellt eine umfangreiche Sammlung zusätzlicher YForm-Value
 - **Icon Picker** – Icon-Auswahl aus Font Awesome und/oder UIkit-Iconsets
 - **Star Rating** – Bewertungsfeld (1-10 Sterne) mit visueller Eingabe
 - **IBAN** – IBAN-Eingabe mit Live-Validierung über openIBAN.com (serverseitig geproxied)
+- **Tagging** – Farbige Schlagwörter (Chips) mit Custom-Color-Picker und WCAG-Kontrastprüfung
 
 ### Komplexe Datentypen (Repeater & Strukturen)
 - **Tabelle** – Barrierefreier Tabelleneditor mit flexiblen Spalten/Zeilen, Min/Max-Constraints und erweiterten Datentypen (Medien, Links, Textarea)
