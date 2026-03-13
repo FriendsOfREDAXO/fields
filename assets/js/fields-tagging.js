@@ -1,115 +1,272 @@
 /**
- * Fields Tagging Widget
- * jQuery-based, direct widget initialization per instance.
+ * Fields Tagging Widget  –  jQuery
+ * Speichert Tags als JSON: [{"text":"...","color":"#..."}]
  */
-(function ($) {
+jQuery(function ($) {
     'use strict';
 
-    function initWidget(wrapper) {
-        var $wrapper    = $(wrapper);
-        var $tags       = $wrapper.find('.fields-tagging-tags');
-        var $input      = $wrapper.find('.fields-tagging-input');
-        var $hidden     = $wrapper.find('.fields-tagging-value');
-        var $addBtn     = $wrapper.find('.fields-tagging-add');
-        var datalistId  = $input.attr('list');
-        var apiUrl      = $wrapper.data('api-url');
-        var sourceTable = $wrapper.data('source-table');
-        var sourceField = $wrapper.data('source-field');
-        var maxTags     = parseInt($wrapper.data('max-tags'), 10) || 0;
+    // ─── WCAG-Kontrast-Helfer ────────────────────────────────────────────
+    function hexToLuminance(hex) {
+        var s = hex.replace('#', '');
+        var r = parseInt(s.slice(0, 2), 16) / 255;
+        var g = parseInt(s.slice(2, 4), 16) / 255;
+        var b = parseInt(s.slice(4, 6), 16) / 255;
+        function lin(c) { return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+        return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+    }
+    function whiteContrast(hex) {
+        return 1.05 / (hexToLuminance(hex) + 0.05);
+    }
+    function okForWhiteText(hex) {
+        return whiteContrast(hex) >= 3.0;
+    }
 
-        if (!$hidden.length) { return; }
+    // ─── Widget initialisieren ───────────────────────────────────────────
+    function initWidget(el) {
+        var $el          = $(el);
+        var $chips       = $el.find('.fields-tagging-chips');
+        var $panel       = $el.find('.fields-tagging-panel');
+        var $input       = $el.find('.fields-tagging-input');
+        var $addBtn      = $el.find('.fields-tagging-add-btn');
+        var $openBtn     = $el.find('.fields-tagging-open-btn');
+        var $closeBtn    = $el.find('.fields-tagging-close-btn');
+        var $preview     = $el.find('.fields-tagging-color-preview');
+        var $suggestions = $el.find('.fields-tagging-suggestions');
+        var $hidden      = $el.find('.fields-tagging-value');
+        var $counter      = $el.find('.fields-tagging-count');
+        var $customColor  = $el.find('.fields-tagging-custom-color');
+        var $contrastHint = $el.find('.fields-tagging-contrast-hint');
 
-        // ---- Suggestions via datalist -----------------------------------
-        if (apiUrl && sourceTable && sourceField && datalistId) {
-            var url = apiUrl + '&table=' + encodeURIComponent(sourceTable) + '&field=' + encodeURIComponent(sourceField);
-            $.get(url, function (data) {
-                if (!data || !data.success || !$.isArray(data.tags)) { return; }
-                var $dl = $('#' + datalistId);
-                $dl.empty();
-                $.each(data.tags, function (i, tag) {
-                    $dl.append($('<option>').val(tag));
-                });
-            }).fail(function () { /* suggestions not critical */ });
-        }
+        var apiUrl      = $el.data('api-url');
+        var srcTable    = $el.data('source-table');
+        var srcField    = $el.data('source-field');
+        var maxTags     = parseInt($el.data('max-tags'), 10) || 0;
+        var colors      = $el.data('colors') || ['#7f8c8d'];
+        var activeColor = colors[0];
+        var suggestionsLoaded = false;
 
-        // ---- Helpers ----------------------------------------------------
-        function existingTags() {
+        // ─── Hilfsfunktionen ─────────────────────────────────────────────
+
+        function currentTags() {
             var result = [];
-            $tags.find('.fields-tagging-tag').each(function () {
-                result.push($(this).data('tag'));
+            $chips.find('.fields-tagging-chip').each(function () {
+                result.push({ text: $(this).data('text'), color: $(this).data('color') });
             });
             return result;
         }
 
-        function updateHidden() {
-            $hidden.val(existingTags().join(','));
+        function syncHidden() {
+            var tags = currentTags();
+            $hidden.val(tags.length ? JSON.stringify(tags) : '');
+            if ($counter.length) {
+                $counter.text(tags.length);
+            }
         }
 
-        function addTag(raw) {
-            var tag = $.trim(raw);
-            if (tag === '') { return; }
-
-            if (maxTags > 0 && existingTags().length >= maxTags) { return; }
-
-            var lower = tag.toLowerCase();
-            var dupe = false;
-            $.each(existingTags(), function (i, t) {
-                if (String(t).toLowerCase() === lower) { dupe = true; return false; }
+        function textExists(text) {
+            var lower = text.toLowerCase();
+            return currentTags().some(function (t) {
+                return t.text.toLowerCase() === lower;
             });
-            if (dupe) { return; }
+        }
 
-            var $chip = $('<span>')
-                .addClass('label label-primary fields-tagging-tag')
-                .css({ display: 'inline-flex', alignItems: 'center', gap: '4px', margin: '2px 4px 2px 0', padding: '4px 6px', fontSize: '13px' })
-                .data('tag', tag)
-                .attr('data-tag', tag)
-                .text(tag + '\u00a0');
+        function addChip(text, color) {
+            text = $.trim(text);
+            if (!text) { return; }
+            if (maxTags > 0 && currentTags().length >= maxTags) { return; }
+            if (textExists(text)) { return; }
 
-            $('<button type="button" aria-label="Tag entfernen">')
-                .addClass('fields-tagging-remove')
-                .css({ background: 'none', border: 'none', padding: 0, lineHeight: 1, cursor: 'pointer', color: 'inherit' })
-                .text('\u00d7')
+            var $chip = $('<span class="fields-tagging-chip">')
+                .data('text', text)
+                .data('color', color)
+                .attr('data-text', text)
+                .attr('data-color', color)
+                .css('background', color)
+                .text(text + '\u00a0');
+
+            $('<button type="button" class="fields-tagging-chip-remove" aria-label="Entfernen">&times;</button>')
                 .appendTo($chip);
 
-            $tags.append($chip);
-            updateHidden();
+            // Chip vor dem Edit-Button einfügen
+            $openBtn.before($chip);
+            syncHidden();
+            updateSuggestionStates();
         }
 
-        // ---- Events (scoped to this widget) -----------------------------
+        function removeChip($chip) {
+            $chip.remove();
+            syncHidden();
+            updateSuggestionStates();
+        }
 
-        $tags.on('click', '.fields-tagging-remove', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            $(this).closest('.fields-tagging-tag').remove();
-            updateHidden();
+        function setActiveColor(color) {
+            activeColor = color;
+            $preview.css('background', color);
+            $el.find('.fields-tagging-color-btn').each(function () {
+                $(this).toggleClass('active', $(this).data('color') === color);
+            });
+        }
+
+        function updateSuggestionStates() {
+            $suggestions.find('.fields-tagging-suggestion-chip').each(function () {
+                $(this).toggleClass('is-selected', textExists($(this).data('text')));
+            });
+        }
+
+        // ─── Vorschläge laden ────────────────────────────────────────────
+
+        function loadSuggestions() {
+            if (suggestionsLoaded) {
+                updateSuggestionStates();
+                return;
+            }
+            if (!apiUrl || !srcTable || !srcField) {
+                $suggestions.html('<em class="text-muted" style="font-size:12px;">Keine Quelle konfiguriert.</em>');
+                suggestionsLoaded = true;
+                return;
+            }
+
+            $suggestions.html('<em class="text-muted" style="font-size:12px;">Wird geladen …</em>');
+
+            $.get(apiUrl, { table: srcTable, field: srcField }, function (data) {
+                $suggestions.empty();
+                if (!data || !data.success || !data.tags || data.tags.length === 0) {
+                    $suggestions.html('<em class="text-muted" style="font-size:12px;">Keine Vorschläge vorhanden.</em>');
+                    suggestionsLoaded = true;
+                    return;
+                }
+                $.each(data.tags, function (i, tag) {
+                    $('<button type="button" class="fields-tagging-suggestion-chip">')
+                        .data('text', tag.text)
+                        .data('color', tag.color)
+                        .css('background', tag.color)
+                        .text(tag.text)
+                        .appendTo($suggestions);
+                });
+                suggestionsLoaded = true;
+                updateSuggestionStates();
+            }).fail(function () {
+                $suggestions.html('<em class="text-muted" style="font-size:12px;">Fehler beim Laden.</em>');
+                suggestionsLoaded = true;
+            });
+        }
+
+        // ─── Events ──────────────────────────────────────────────────────
+
+        // Panel öffnen
+        $openBtn.on('click', function () {
+            $panel.slideDown(150);
+            $openBtn.hide();
+            loadSuggestions();
+            $input.trigger('focus');
         });
 
-        $addBtn.on('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            addTag($input.val());
-            $input.val('').trigger('focus');
+        // Panel schließen
+        $closeBtn.on('click', function () {
+            $panel.slideUp(150, function () { $openBtn.show(); });
         });
 
-        $input.on('keydown', function (e) {
-            if (e.key === 'Enter' || e.keyCode === 13) {
-                e.preventDefault();
-                e.stopPropagation();
-                addTag($input.val());
-                $input.val('');
+        // Chip entfernen (per Klick auf ×)
+        $chips.on('click', '.fields-tagging-chip-remove', function (e) {
+            e.preventDefault();
+            removeChip($(this).closest('.fields-tagging-chip'));
+        });
+
+        // Farbe wählen
+        $el.on('click', '.fields-tagging-color-btn', function (e) {
+            e.preventDefault();
+            setActiveColor($(this).data('color'));
+            // Custom-Color-Input mitziehen
+            $customColor.val($(this).data('color'));
+            $contrastHint.hide();
+            $customColor.removeClass('fields-tagging-color-invalid');
+        });
+
+        // Eigene Farbe wählen
+        $customColor.on('input change', function () {
+            var hex = $(this).val();
+            if (okForWhiteText(hex)) {
+                $contrastHint.hide();
+                $customColor.removeClass('fields-tagging-color-invalid');
+                // Palette-Buttons deselektieren
+                $el.find('.fields-tagging-color-btn').removeClass('active');
+                setActiveColor(hex);
+            } else {
+                $contrastHint.show();
+                $customColor.addClass('fields-tagging-color-invalid');
             }
         });
 
-        // Safety net: sync hidden value before form submit
-        $wrapper.closest('form').on('submit.fields-tagging', function () {
-            updateHidden();
+        // Tag hinzufügen per Button
+        $addBtn.on('click', function (e) {
+            e.preventDefault();
+            var text = $.trim($input.val());
+            if (text) {
+                addChip(text, activeColor);
+                $input.val('').trigger('focus');
+            }
         });
+
+        // Tag hinzufügen per Enter
+        $input.on('keydown', function (e) {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                e.preventDefault();
+                var text = $.trim($input.val());
+                if (text) {
+                    addChip(text, activeColor);
+                    $input.val('');
+                }
+            }
+        });
+
+        // Vorschlag klicken → hinzufügen (aktive Farbe ODER Farbe des Vorschlags)
+        $suggestions.on('click', '.fields-tagging-suggestion-chip', function (e) {
+            e.preventDefault();
+            var $s = $(this);
+            if ($s.hasClass('is-selected')) {
+                // Bereits vorhanden → entfernen
+                $chips.find('.fields-tagging-chip').each(function () {
+                    if ($(this).data('text').toLowerCase() === $s.data('text').toLowerCase()) {
+                        removeChip($(this));
+                    }
+                });
+            } else {
+                // Farbe des Vorschlags verwenden (aber aktive Farbe überschreibt)
+                var color = activeColor !== colors[0] ? activeColor : $s.data('color');
+                addChip($s.data('text'), color);
+            }
+        });
+
+        // Form-Submit Sicherung
+        $el.closest('form').on('submit.fields-tagging', function () {
+            syncHidden();
+        });
+
+        // Initial: ersten Farbknopf aktivieren
+        setActiveColor(activeColor);
+
+        // Chips aus hidden-Input initialisieren (wenn PHP keine vorgerendert hat,
+        // z.B. in rex_form / Forcal-Kontext)
+        (function initChipsFromHidden() {
+            if ($chips.find('.fields-tagging-chip').length > 0) { return; }
+            var raw = $hidden.val();
+            if (!raw) { return; }
+            try {
+                var stored = JSON.parse(raw);
+                if (Array.isArray(stored)) {
+                    $.each(stored, function (i, tag) {
+                        if (tag.text && tag.color) { addChip(tag.text, tag.color); }
+                    });
+                }
+            } catch (e) { /* JSON invalid – ignore */ }
+        }());
     }
 
+    // ─── Alle Widgets auf der Seite initialisieren ────────────────────
     function initAll(scope) {
-        $(scope || document).find('.fields-tagging').each(function () {
-            if (!$(this).data('tagging-init')) {
-                $(this).data('tagging-init', true);
+        $(scope || document).find('.fields-tagging-widget').each(function () {
+            if (!$(this).data('ft-init')) {
+                $(this).data('ft-init', true);
                 initWidget(this);
             }
         });
@@ -119,6 +276,6 @@
         initAll(container);
     });
 
-    $(function () { initAll(document); });
+    initAll(document);
+});
 
-}(jQuery));

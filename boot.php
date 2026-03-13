@@ -34,11 +34,14 @@ if (rex::isBackend() && rex::getUser()) {
     rex_view::addJsFile($addon->getAssetsUrl('js/fields-interactive.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/fields-structure.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/fields-tagging.js'));
-    
-    $faIcons = $addon->getConfig('icons_fontawesome');
-    $uikitIcons = $addon->getConfig('icons_uikit');
 
-    // Split and filter custom icons if available
+    rex_view::addCssFile($addon->getAssetsUrl('css/fields-backend.css'));
+    rex_view::addCssFile($addon->getAssetsUrl('css/fields-tagging.css'));
+    rex_view::addJsFile($addon->getAssetsUrl('js/fields-backend.js'));
+    rex_view::addJsFile($addon->getAssetsUrl('js/fields-table.js'));
+
+    $faIcons    = $addon->getConfig('icons_fontawesome');
+    $uikitIcons = $addon->getConfig('icons_uikit');
     $customIcons = [];
     if (!empty($faIcons)) {
         $customIcons['fa'] = array_filter(array_map('trim', explode(',', $faIcons)));
@@ -46,12 +49,7 @@ if (rex::isBackend() && rex::getUser()) {
     if (!empty($uikitIcons)) {
         $customIcons['uikit'] = array_filter(array_map('trim', explode(',', $uikitIcons)));
     }
-
     if (!empty($customIcons)) {
         rex_view::setJsProperty('fields_icons', $customIcons);
     }
-
-    rex_view::addCssFile($addon->getAssetsUrl('css/fields-backend.css'));
-    rex_view::addJsFile($addon->getAssetsUrl('js/fields-backend.js'));
-    rex_view::addJsFile($addon->getAssetsUrl('js/fields-table.js'));
 }

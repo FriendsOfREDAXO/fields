@@ -1,35 +1,45 @@
 <?php
 
+use FriendsOfRedaxo\Fields\FieldsTagging;
+
 /**
  * YForm Value: Tagging
  *
- * Speichert Tags als normalisierte, kommaseparierte Liste.
- * Vorschläge können optional per API aus einer Quelltabelle geladen werden.
+ * Speichert Tags als JSON-Array mit Text und Farbe.
+ * Format: [{"text":"php","color":"#3498db"}, ...]
  *
  * @package fields
  */
 class rex_yform_value_fields_tagging extends rex_yform_value_abstract
 {
+    /** @var list<string> – delegiert an FieldsTagging::DEFAULT_COLORS */
+    public const DEFAULT_COLORS = FieldsTagging::DEFAULT_COLORS;
+
     public function enterObject(): void
     {
+        // YForm sets $this->value from POST automatically before calling enterObject()
         $value = (string) $this->getValue();
 
-        if ($this->params['send']) {
-            $value = (string) rex_request($this->getFieldName(), 'string', '');
+        // Normalize: parse submitted JSON, re-encode clean
+        $tags = $this->decodeTagJson($value);
+        $maxTags = max(0, (int) $this->getElement('max_tags'));
+        if ($maxTags > 0 && count($tags) > $maxTags) {
+            $tags = array_slice($tags, 0, $maxTags);
         }
 
-        $value = $this->normalizeTagString($value);
+        $value = $tags !== [] ? (string) json_encode($tags, JSON_UNESCAPED_UNICODE) : '';
         $this->setValue($value);
 
         if ($this->needsOutput() && $this->isViewable()) {
             $this->params['form_output'][$this->getId()] = $this->parse(
                 'value.fields_tagging.tpl.php',
                 [
-                    'value' => $value,
-                    'tags' => $this->toTagArray($value),
+                    'value'        => $value,
+                    'tags'         => $tags,
                     'source_table' => (string) $this->getElement('source_table'),
                     'source_field' => (string) $this->getElement('source_field'),
-                    'max_tags' => max(0, (int) $this->getElement('max_tags')),
+                    'max_tags'     => $maxTags,
+                    'colors'       => self::DEFAULT_COLORS,
                 ],
             );
         }
@@ -51,74 +61,55 @@ class rex_yform_value_fields_tagging extends rex_yform_value_abstract
     public function getDefinitions(): array
     {
         return [
-            'type' => 'value',
-            'name' => 'fields_tagging',
+            'type'  => 'value',
+            'name'  => 'fields_tagging',
             'values' => [
-                'name' => ['type' => 'name', 'label' => rex_i18n::msg('yform_values_defaults_name')],
-                'label' => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_defaults_label')],
+                'name'         => ['type' => 'name', 'label' => rex_i18n::msg('yform_values_defaults_name')],
+                'label'        => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_defaults_label')],
                 'source_table' => ['type' => 'text', 'label' => rex_i18n::msg('fields_tagging_source_table')],
                 'source_field' => ['type' => 'text', 'label' => rex_i18n::msg('fields_tagging_source_field')],
-                'max_tags' => ['type' => 'text', 'label' => rex_i18n::msg('fields_tagging_max_tags')],
-                'notice' => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_defaults_notice')],
+                'max_tags'     => ['type' => 'text', 'label' => rex_i18n::msg('fields_tagging_max_tags')],
+                'notice'       => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_defaults_notice')],
             ],
             'description' => rex_i18n::msg('fields_tagging_description'),
-            'db_type' => ['text'],
-            'famous' => false,
+            'db_type'     => ['text'],
+            'famous'      => false,
         ];
     }
 
     public static function getListValue(array $params): string
     {
-        $value = trim((string) ($params['value'] ?? ''));
-        if ($value === '') {
+        $raw = trim((string) ($params['value'] ?? ''));
+        if ($raw === '') {
             return '-';
         }
 
-        $tags = array_filter(array_map('trim', explode(',', $value)), static fn (string $tag): bool => $tag !== '');
-        if ($tags === []) {
+        $decoded = json_decode($raw, true);
+        if (!is_array($decoded) || $decoded === []) {
             return '-';
         }
 
         $output = [];
-        foreach ($tags as $tag) {
-            $output[] = '<span class="label label-default" style="margin-right:4px;">' . rex_escape($tag) . '</span>';
-        }
-
-        return implode('', $output);
-    }
-
-    private function normalizeTagString(string $rawValue): string
-    {
-        $parts = preg_split('/[,;]+/', $rawValue);
-        if (!is_array($parts)) {
-            return '';
-        }
-
-        $tags = [];
-        foreach ($parts as $part) {
-            $tag = trim((string) $part);
-            if ($tag === '') {
+        foreach ($decoded as $item) {
+            if (!is_array($item) || !isset($item['text'])) {
                 continue;
             }
-
-            $normalized = rex_string::normalize($tag, '-', '_');
-            if ($normalized === '') {
-                continue;
-            }
-
-            $tags[$normalized] = $normalized;
+            $color = isset($item['color']) ? rex_escape($item['color']) : '#7f8c8d';
+            $output[] = sprintf(
+                '<span style="display:inline-block;background:%s;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;margin:1px 2px;">%s</span>',
+                $color,
+                rex_escape((string) $item['text']),
+            );
         }
 
-        return implode(',', array_values($tags));
+        return $output !== [] ? implode('', $output) : '-';
     }
 
     /**
-     * @return array<int, string>
+     * @return list<array{text:string,color:string}>
      */
-    private function toTagArray(string $value): array
+    public function decodeTagJson(string $raw): array
     {
-        $tags = array_filter(array_map('trim', explode(',', $value)), static fn (string $tag): bool => $tag !== '');
-
-        return array_values(array_unique($tags));
+        return FieldsTagging::decode($raw);
     }
 }

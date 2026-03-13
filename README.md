@@ -62,6 +62,7 @@ Die Feldtypen erscheinen nach der Installation automatisch in der YForm-Feldausw
 | `fields_inline_switch` | `tinyint(1)` | Boolescher Switch für Listen- & Formularansicht |
 | `fields_inline` | `text`, `mediumtext` | Text/Textarea mit Inline-Editing in der Liste |
 | `fields_inline_number` | `int`, `float`, `decimal` | Zahlenfeld mit Inline-Editing (Präfix/Suffix/Min/Max) |
+| `fields_tagging` | `text` | Farbige Tag-Chips als JSON mit WCAG-konformem Farbpicker |
 
 ## Frontend-Ausgabe mit Fragmenten
 
@@ -349,6 +350,94 @@ Mit dem Feldtyp `fields_inline` können Text- und Textarea-Felder in der YForm-T
 - **Speichern**: Enter (bei Textfeldern) oder Klick auf den Haken.
 - **Abbruch**: ESC oder Klick auf das X.
 - **Events**: Löst beim Speichern die Standard YForm-Events (`YFORM_DATA_UPDATED`) aus, sodass andere AddOns (z.B. URL AddOn) Änderungen registrieren.
+
+---
+
+## Tags & Tagging (`fields_tagging`)
+
+Der Feldtyp **`fields_tagging`** ermöglicht die Vergabe farbiger Schlagwörter direkt im YForm-Formular. Tags werden als JSON gespeichert und tragen jeweils einen Text und eine Farbe.
+
+**DB-Typ:** `text`  
+**Datenformat:** `[{"text":"php","color":"#2980b9"}, ...]`
+
+### Einrichtung im Table Manager
+
+| Parameter | Beschreibung |
+|---|---|
+| `source_table` | Tabelle aus der Vorschläge geladen werden (ohne Prefix, z.B. `rex_products`) |
+| `source_field` | Spaltenname der Quelle |
+| `max_tags` | Maximale Tag-Anzahl (0 = unbegrenzt) |
+| `notice` | Hinweistext unter dem Feld |
+
+### Widget
+
+- Button öffnet ein Editor-Panel mit Farbpalette und Texteingabe
+- **Eigene Farbe** per Farbpicker wählbar – WCAG-Kontrastprüfung (≥ 3.0:1) blockiert zu helle Farben für weiße Schrift
+- Vorschläge aus einer konfigurierbaren Quelltabelle (AJAX)
+- Vorschlag anklicken → hinzufügen, erneut anklicken → entfernen
+
+### Frontend-Ausgabe mit `FieldsTagging`
+
+Die Hilfsklasse `FieldsTagging` (Namespace `FriendsOfRedaxo\Fields`, automatisch via REDAXO-Autoloader geladen) stellt alle nötigen Methoden bereit:
+
+```php
+use FriendsOfRedaxo\Fields\FieldsTagging;
+
+// Tags aus DB-Wert dekodieren
+$tags = FieldsTagging::decode($item->getValue('tags'));
+// → [["text" => "php", "color" => "#2980b9"], ...]
+
+// Nur Texte als String-Array
+$texte = FieldsTagging::getTexts($tags);
+// → ["php", "redaxo"]
+
+// Als farbige HTML-Chips ausgeben
+echo FieldsTagging::toHtml($tags);
+// → <span style="background:#2980b9;...">php</span> ...
+
+// Direkt aus DB-Rohwert (Kurzform)
+echo FieldsTagging::fromRaw($item->getValue('tags'), '–');
+
+// Einzelnen Chip rendern
+echo FieldsTagging::chipHtml('php', '#2980b9');
+
+// Tags enkodieren (z.B. nach manueller Manipulation)
+$json = FieldsTagging::encode($tags);
+```
+
+### Datenbankabfragen mit `FieldsTagging`
+
+```php
+use FriendsOfRedaxo\Fields\FieldsTagging;
+
+// Alle eindeutigen Tags aus einer Tabellenspalte sammeln (alphabetisch sortiert)
+$alleTags = FieldsTagging::collectFromTable('rex_products', 'tags');
+// → [["text" => "php", "color" => "#2980b9"], ["text" => "redaxo", ...], ...]
+
+// Nur Texte
+$texte = FieldsTagging::collectTextsFromTable('rex_products', 'tags');
+// → ["php", "redaxo", ...]
+
+// SQL-WHERE-Fragment für MySQL JSON-Suche (MySQL >= 5.7)
+$sql = rex_sql::factory();
+$rows = $sql->getArray(
+    'SELECT * FROM rex_products WHERE ' . FieldsTagging::sqlHasTag('tags', 'php')
+);
+
+// Mit YOrm (rex_yorm)
+$products = rex_yorm::table('rex_products')
+    ->whereRaw(FieldsTagging::sqlHasTag('tags', 'php'))
+    ->find();
+
+// PHP-Filter (wenn Ergebnisse bereits im Speicher)
+$gefiltert = FieldsTagging::filterByTag($rows, 'tags', 'php');
+```
+
+### Listenansicht
+
+In der YForm-Tabellenübersicht werden Tags automatisch als farbige Chips dargestellt (via `getListValue()`).
+
+---
 
 ## Unterstützte Plattformen (Social Web)
 
