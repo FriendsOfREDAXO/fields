@@ -39,15 +39,11 @@ $apiUrl = rex_url::backendController(['rex-api-call' => 'fields_tagging_suggest'
         </div>
 
         <div class="input-group" style="margin-top:8px;">
-            <input type="text" class="form-control fields-tagging-input" placeholder="<?= rex_i18n::msg('fields_tagging_placeholder') ?>" autocomplete="off">
+            <input type="text" class="form-control fields-tagging-input" id="<?= $fieldId ?>_input" list="<?= $fieldId ?>_suggestions" placeholder="<?= rex_i18n::msg('fields_tagging_placeholder') ?>" autocomplete="off">
+            <datalist id="<?= $fieldId ?>_suggestions"></datalist>
             <span class="input-group-btn">
                 <button class="btn btn-default fields-tagging-add" type="button"><?= rex_i18n::msg('fields_tagging_add') ?></button>
             </span>
-        </div>
-
-        <div style="margin-top:8px;">
-            <select class="form-control fields-tagging-suggest selectpicker" data-live-search="true" multiple title="<?= rex_i18n::msg('fields_tagging_suggest_title') ?>"></select>
-            <button class="btn btn-default btn-xs fields-tagging-add-suggest" type="button" style="margin-top:6px;"><?= rex_i18n::msg('fields_tagging_add_selected') ?></button>
         </div>
 
         <input type="hidden" name="<?= $fieldName ?>" value="<?= rex_escape((string) $value) ?>" class="fields-tagging-value">
