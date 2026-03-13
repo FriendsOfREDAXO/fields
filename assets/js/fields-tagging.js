@@ -219,7 +219,7 @@ jQuery(function ($) {
             }
         });
 
-        // Vorschlag klicken → hinzufügen (aktive Farbe ODER Farbe des Vorschlags)
+        // Vorschlag klicken → immer mit eigener gespeicherter Farbe hinzufügen
         $suggestions.on('click', '.fields-tagging-suggestion-chip', function (e) {
             e.preventDefault();
             var $s = $(this);
@@ -231,9 +231,8 @@ jQuery(function ($) {
                     }
                 });
             } else {
-                // Farbe des Vorschlags verwenden (aber aktive Farbe überschreibt)
-                var color = activeColor !== colors[0] ? activeColor : $s.data('color');
-                addChip($s.data('text'), color);
+                // Immer die Farbe des Vorschlags verwenden, nie die aktive Farbe
+                addChip($s.data('text'), $s.data('color'));
             }
         });
 
