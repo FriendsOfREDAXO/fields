@@ -12,6 +12,18 @@ fields_social_web_remove = Profil entfernen
 fields_social_web_icon_set = Icon-Set
 fields_social_web_icon_set_notice = Font Awesome oder UIkit Icons für die Darstellung
 
+# Tagging
+fields_tagging = Tagging
+fields_tagging_description = Tags als Chips mit Vorschlägen verwalten
+fields_tagging_source_table = Quell-Tabelle für Vorschläge
+fields_tagging_source_field = Quell-Feld für Vorschläge
+fields_tagging_max_tags = Maximale Anzahl Tags (0 = unbegrenzt)
+fields_tagging_add = Tag hinzufügen
+fields_tagging_remove = Tag entfernen
+fields_tagging_add_selected = Ausgewählte Vorschläge übernehmen
+fields_tagging_placeholder = Tag eingeben und Enter drücken
+fields_tagging_suggest_title = Vorschläge
+
 # Opening Hours
 fields_opening_hours = Öffnungszeiten
 fields_opening_hours_description = Öffnungszeiten mit Sonderzeiten verwalten

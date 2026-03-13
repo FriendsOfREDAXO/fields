@@ -10,6 +10,7 @@
 
 use FriendsOfRedaxo\Fields\rex_api_fields_iban_validate;
 use FriendsOfRedaxo\Fields\rex_api_fields_inline_update;
+use FriendsOfRedaxo\Fields\rex_api_fields_tagging_suggest;
 
 $addon = rex_addon::get('fields');
 
@@ -25,6 +26,7 @@ if (rex_addon::get('yform')->isAvailable()) {
 // API-Klassen registrieren
 rex_api_function::register('fields_iban_validate', rex_api_fields_iban_validate::class);
 rex_api_function::register('fields_inline_update', rex_api_fields_inline_update::class);
+rex_api_function::register('fields_tagging_suggest', rex_api_fields_tagging_suggest::class);
 
 // Backend-Assets laden
 if (rex::isBackend() && rex::getUser()) {

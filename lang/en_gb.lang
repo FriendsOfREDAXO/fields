@@ -12,6 +12,18 @@ fields_social_web_remove = Remove profile
 fields_social_web_icon_set = Icon set
 fields_social_web_icon_set_notice = Font Awesome or UIkit icons for display
 
+# Tagging
+fields_tagging = Tagging
+fields_tagging_description = Manage tags as chips with suggestions
+fields_tagging_source_table = Source table for suggestions
+fields_tagging_source_field = Source field for suggestions
+fields_tagging_max_tags = Maximum tags (0 = unlimited)
+fields_tagging_add = Add tag
+fields_tagging_remove = Remove tag
+fields_tagging_add_selected = Add selected suggestions
+fields_tagging_placeholder = Enter tag and press Enter
+fields_tagging_suggest_title = Suggestions
+
 # Opening Hours
 fields_opening_hours = Opening Hours
 fields_opening_hours_description = Manage opening hours with special dates

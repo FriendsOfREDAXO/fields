@@ -23,6 +23,7 @@
         registerIbanEvents();
         registerIconPickerEvents();
         registerRepeaterSocialEvents();
+        registerTaggingEvents();
     }
 
     function init() {
@@ -164,6 +165,219 @@
         } else if (wrapper.classList.contains('fields-opening-hours')) {
             updateOpeningHoursValue(wrapper);
         }
+    }
+
+    // ============================================================
+    // Tagging Field
+    // ============================================================
+
+    function registerTaggingEvents() {
+        document.addEventListener('click', function (e) {
+            var addBtn = e.target.closest('.fields-tagging-add');
+            if (addBtn) {
+                var wrapper = addBtn.closest('.fields-tagging');
+                if (!wrapper) return;
+                var input = wrapper.querySelector('.fields-tagging-input');
+                if (!input) return;
+                addTag(wrapper, input.value);
+                input.value = '';
+                return;
+            }
+
+            var removeBtn = e.target.closest('.fields-tagging-remove');
+            if (removeBtn) {
+                var tagEl = removeBtn.closest('.fields-tagging-tag');
+                var tagWrapper = removeBtn.closest('.fields-tagging');
+                if (tagEl) {
+                    tagEl.remove();
+                }
+                if (tagWrapper) {
+                    syncTaggingValue(tagWrapper);
+                }
+                return;
+            }
+
+            var addSuggestBtn = e.target.closest('.fields-tagging-add-suggest');
+            if (addSuggestBtn) {
+                var suggestWrapper = addSuggestBtn.closest('.fields-tagging');
+                if (!suggestWrapper) return;
+                var suggestSelect = suggestWrapper.querySelector('.fields-tagging-suggest');
+                if (!suggestSelect) return;
+
+                var selected = Array.prototype.slice.call(suggestSelect.selectedOptions || []);
+                selected.forEach(function (opt) {
+                    addTag(suggestWrapper, opt.value);
+                });
+
+                for (var i = 0; i < suggestSelect.options.length; i++) {
+                    suggestSelect.options[i].selected = false;
+                }
+
+                if (window.jQuery && window.jQuery.fn && window.jQuery.fn.selectpicker) {
+                    window.jQuery(suggestSelect).selectpicker('refresh');
+                }
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            var input = e.target.closest('.fields-tagging-input');
+            if (!input) return;
+
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                var wrapper = input.closest('.fields-tagging');
+                if (!wrapper) return;
+                addTag(wrapper, input.value);
+                input.value = '';
+            }
+        });
+
+        document.addEventListener('focusin', function (e) {
+            var input = e.target.closest('.fields-tagging-input');
+            if (!input) return;
+            var wrapper = input.closest('.fields-tagging');
+            if (!wrapper) return;
+            loadTagSuggestions(wrapper, '');
+        });
+
+        document.addEventListener('input', function (e) {
+            var input = e.target.closest('.fields-tagging-input');
+            if (!input) return;
+            var wrapper = input.closest('.fields-tagging');
+            if (!wrapper) return;
+            loadTagSuggestions(wrapper, input.value || '');
+        });
+
+        document.querySelectorAll('.fields-tagging').forEach(function (wrapper) {
+            syncTaggingValue(wrapper);
+            initSuggestionSelectpicker(wrapper);
+            loadTagSuggestions(wrapper, '');
+        });
+    }
+
+    function addTag(wrapper, rawTag) {
+        var tag = normalizeTag(rawTag);
+        if (!tag) return;
+
+        var maxTags = parseInt(wrapper.dataset.maxTags || '0', 10);
+        var tagsContainer = wrapper.querySelector('.fields-tagging-tags');
+        if (!tagsContainer) return;
+
+        var existing = tagsContainer.querySelector('[data-tag="' + cssEscape(tag) + '"]');
+        if (existing) {
+            return;
+        }
+
+        var currentCount = tagsContainer.querySelectorAll('.fields-tagging-tag').length;
+        if (maxTags > 0 && currentCount >= maxTags) {
+            return;
+        }
+
+        var span = document.createElement('span');
+        span.className = 'label label-primary fields-tagging-tag';
+        span.setAttribute('data-tag', tag);
+        span.appendChild(document.createTextNode(tag + ' '));
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'fields-tagging-remove';
+        btn.setAttribute('aria-label', 'remove');
+        btn.innerHTML = '&times;';
+        span.appendChild(btn);
+
+        tagsContainer.appendChild(span);
+        syncTaggingValue(wrapper);
+    }
+
+    function syncTaggingValue(wrapper) {
+        var hidden = wrapper.querySelector('.fields-tagging-value');
+        var tagsContainer = wrapper.querySelector('.fields-tagging-tags');
+        if (!hidden || !tagsContainer) return;
+
+        var tags = [];
+        tagsContainer.querySelectorAll('.fields-tagging-tag').forEach(function (el) {
+            var tag = (el.getAttribute('data-tag') || '').trim();
+            if (tag) {
+                tags.push(tag);
+            }
+        });
+
+        hidden.value = tags.join(',');
+    }
+
+    function loadTagSuggestions(wrapper, q) {
+        var table = wrapper.dataset.sourceTable || '';
+        var field = wrapper.dataset.sourceField || '';
+        var apiUrl = wrapper.dataset.apiUrl || '';
+        if (!table || !field || !apiUrl) return;
+
+        var url = apiUrl + '&table=' + encodeURIComponent(table) + '&field=' + encodeURIComponent(field) + '&q=' + encodeURIComponent(q) + '&limit=60';
+
+        fetch(url, { credentials: 'same-origin' })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (!data || !data.success || !Array.isArray(data.tags)) {
+                    return;
+                }
+
+                var select = wrapper.querySelector('.fields-tagging-suggest');
+                if (!select) return;
+
+                var selectedValues = Array.prototype.slice.call(select.selectedOptions || []).map(function (opt) { return opt.value; });
+
+                select.innerHTML = '';
+                data.tags.forEach(function (tag) {
+                    var opt = document.createElement('option');
+                    opt.value = tag;
+                    opt.textContent = tag;
+                    if (selectedValues.indexOf(tag) !== -1) {
+                        opt.selected = true;
+                    }
+                    select.appendChild(opt);
+                });
+
+                if (window.jQuery && window.jQuery.fn && window.jQuery.fn.selectpicker) {
+                    window.jQuery(select).selectpicker('refresh');
+                }
+            })
+            .catch(function () {
+                // API optional, still usable without suggestions
+            });
+    }
+
+    function initSuggestionSelectpicker(wrapper) {
+        var select = wrapper.querySelector('.fields-tagging-suggest');
+        if (!select || !window.jQuery || !window.jQuery.fn || !window.jQuery.fn.selectpicker) {
+            return;
+        }
+
+        var $select = window.jQuery(select);
+        if (!$select.data('selectpicker')) {
+            $select.selectpicker({
+                liveSearch: true,
+                actionsBox: true,
+                selectedTextFormat: 'count > 2'
+            });
+        } else {
+            $select.selectpicker('refresh');
+        }
+    }
+
+    function normalizeTag(raw) {
+        if (!raw) return '';
+        var tag = String(raw).toLowerCase().trim();
+        tag = tag.replace(/[,;]+/g, '-');
+        tag = tag.replace(/[^a-z0-9\-_äöüß]+/g, '-');
+        tag = tag.replace(/-+/g, '-');
+        tag = tag.replace(/^[-_]+|[-_]+$/g, '');
+        return tag;
+    }
+
+    function cssEscape(value) {
+        if (window.CSS && typeof window.CSS.escape === 'function') {
+            return window.CSS.escape(value);
+        }
+        return String(value).replace(/(["'\\.#:[\](){}+~*^$|=!<>/@])/g, '\\$1');
     }
 
     // ============================================================
