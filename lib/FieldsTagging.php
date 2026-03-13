@@ -150,10 +150,10 @@ class FieldsTagging
         $sql = rex_sql::factory();
         try {
             $rows = $sql->getArray(
-                'SELECT ' . rex_sql::escapeIdentifier($field) .
-                ' FROM ' . rex_sql::escapeIdentifier(rex::getTablePrefix() . $table) .
-                ' WHERE ' . rex_sql::escapeIdentifier($field) . ' IS NOT NULL' .
-                ' AND ' . rex_sql::escapeIdentifier($field) . " != ''",
+                'SELECT ' . $sql->escapeIdentifier($field) .
+                ' FROM ' . $sql->escapeIdentifier(rex::getTablePrefix() . $table) .
+                ' WHERE ' . $sql->escapeIdentifier($field) . ' IS NOT NULL' .
+                ' AND ' . $sql->escapeIdentifier($field) . " != ''",
             );
         } catch (rex_sql_exception $e) {
             return [];
@@ -200,10 +200,11 @@ class FieldsTagging
      */
     public static function sqlHasTag(string $field, string $tagText): string
     {
-        $escapedField = rex_sql::escapeIdentifier($field);
-        $escapedText  = rex_sql::factory()->escape($tagText);
+        $sql          = rex_sql::factory();
+        $escapedField = $sql->escapeIdentifier($field);
+        $escapedText  = $sql->escape($tagText);
 
-        return "JSON_SEARCH({$escapedField}, 'one', {$escapedText}, NULL, '\$[*].text') IS NOT NULL";
+        return "JSON_SEARCH({$escapedField}, 'one', {$escapedText}, NULL, '$[*].text') IS NOT NULL";
     }
 
     /**
