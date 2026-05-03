@@ -215,6 +215,73 @@ body.rex-theme-dark {
     background: var(--fields-input-bg);
 }
 
+.fields-media-meta-preview {
+    margin-top: 10px;
+    border: 1px solid var(--fields-panel-border);
+    border-radius: 4px;
+    background: var(--fields-panel-bg);
+}
+
+.fields-media-meta-preview-summary {
+    cursor: pointer;
+    padding: 8px 10px;
+    font-weight: 600;
+    color: var(--fields-heading-text);
+    background: var(--fields-heading-bg);
+}
+
+.fields-media-meta-preview-content {
+    padding: 10px;
+}
+
+.fields-media-meta-raw {
+    margin-top: 8px;
+}
+
+.fields-media-meta-raw-summary {
+    cursor: pointer;
+    color: var(--fields-btn-text);
+    font-size: 12px;
+}
+
+.fields-media-meta-raw-content {
+    margin-top: 8px;
+}
+
+.fields-media-meta-raw-input {
+    display: none;
+}
+
+.fields-media-meta-raw[open] .fields-media-meta-raw-input {
+    display: block;
+}
+
+.fields-media-meta-table {
+    margin-bottom: 0;
+}
+
+.fields-media-meta-table th {
+    width: 28%;
+}
+
+.fields-media-meta-scalar {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.fields-media-meta-list {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.fields-media-meta-entry {
+    margin-bottom: 8px;
+}
+
+.fields-media-meta-entry-content {
+    padding-top: 8px;
+}
+
 /* Crop Overlay / Modal */
 .fields-crop-overlay {
     position: fixed;
@@ -657,6 +724,106 @@ body.rex-theme-dark .fields-table-editor .fields-is-header input.form-control {
 .fields-inline-switch.loading {
     opacity: 0.7;
     cursor: wait;
+}
+
+/* Inline Select */
+.js-fields-inline-select,
+.js-fields-inline-select-list {
+    /* handled via overlay – no direct styles needed */
+}
+
+/* Inline Select Cell (Container für Badge + Select Overlay) */
+.fields-inline-select-cell {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Badge: zeigt aktuellen Wert mit Farb-Dot */
+.fields-inline-select-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px 3px 7px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(0, 0, 0, 0.07);
+    color: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+    transition: background .15s;
+    border: 1px solid transparent;
+}
+.fields-inline-select-display:hover {
+    background: rgba(0, 0, 0, 0.13);
+}
+body.rex-theme-dark .fields-inline-select-display {
+    background: rgba(255, 255, 255, 0.1);
+}
+body.rex-theme-dark .fields-inline-select-display:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .fields-inline-select-display {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    body.rex-has-theme:not(.rex-theme-light) .fields-inline-select-display:hover {
+        background: rgba(255, 255, 255, 0.18);
+    }
+}
+
+/* Farbpunkt */
+.fields-inline-color-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.15);
+}
+
+/* Natives Select als unsichtbares Overlay – Klick darauf öffnet Browser-Dropdown */
+.fields-inline-select-native {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    font-size: 16px; /* verhindert iOS-Zoom */
+}
+.fields-inline-select-native.fields-inline-select-loading {
+    cursor: wait;
+    pointer-events: none;
+}
+
+/* Gespeichertes Feedback am Badge */
+.fields-inline-select-display.fields-inline-select-saved {
+    outline: 2px solid #5bb585;
+    outline-offset: 1px;
+    transition: outline 0.3s ease;
+}
+
+/* Gesperrter Value */
+.fields-inline-select-lock-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px 3px 7px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: not-allowed;
+    background: #e9ecef;
+    color: #333;
+    border: 1px solid rgba(0,0,0,.1);
+    white-space: nowrap;
+    opacity: .85;
+}
+.fields-inline-select-lock-badge:hover {
+    opacity: .7;
 }
 
 /* Improve Dark Mode Colors for Switch (Explicit & Auto) */

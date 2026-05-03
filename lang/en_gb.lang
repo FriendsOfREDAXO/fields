@@ -23,6 +23,7 @@ fields_tagging_remove = Remove tag
 fields_tagging_add_selected = Add selected suggestions
 fields_tagging_placeholder = Enter tag and press Enter
 fields_tagging_suggest_title = Suggestions
+fields_search_not_empty = Not empty
 
 # Opening Hours
 fields_opening_hours = Opening Hours

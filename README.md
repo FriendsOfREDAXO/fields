@@ -4,6 +4,11 @@
 
 Das AddOn **Fields** stellt eine umfangreiche Sammlung zusätzlicher YForm-Value-Feldtypen bereit, die häufig benötigte Eingabemuster und Strukturierungsmöglichkeiten abdecken – von Social-Media-Profilen und Tabellen bis hin zu Tabs, Akkordeons und Grid-Layouts.
 
+## Neu in 1.2.0
+
+- **Inline Select (`fields_inline_select`)**: Neues Auswahlfeld mit Inline-Bearbeitung in der YForm-Liste, optionalen Farben pro Status und sperrbaren Endstatus-Werten.
+- **Tagging-Suche (`fields_tagging`)**: Erweiterte YForm-Manager-Suche mit Checkbox-Liste, farbigen Tag-Markern und sauberem `(empty)` / `Nicht leer`-Verhalten.
+
 ## Funktionen
 
 ### Spezielle Eingabetypen (UI Controls)
@@ -14,6 +19,15 @@ Das AddOn **Fields** stellt eine umfangreiche Sammlung zusätzlicher YForm-Value
 - **Star Rating** – Bewertungsfeld (1-10 Sterne) mit visueller Eingabe
 - **IBAN** – IBAN-Eingabe mit Live-Validierung über openIBAN.com (serverseitig geproxied)
 - **Tagging** – Farbige Schlagwörter (Chips) mit Custom-Color-Picker und WCAG-Kontrastprüfung
+
+### Tagging: Suche im YForm-Manager
+
+Das Feld `fields_tagging` bringt eine eigene Suchintegration fuer den YForm-Tablemanager mit:
+
+- Mehrfachauswahl als **Checkbox-Liste** (statt Freitext)
+- Farbige Marker je Tag in der Auswahl
+- Zusatzauswahl fuer **(empty)** und **Nicht leer**
+- Robuste Filterung fuer `NULL`, leere Strings und `[]`
 
 ### Komplexe Datentypen (Repeater & Strukturen)
 - **Tabelle** – Barrierefreier Tabelleneditor mit flexiblen Spalten/Zeilen, Min/Max-Constraints und erweiterten Datentypen (Medien, Links, Textarea)
@@ -63,6 +77,7 @@ Die Feldtypen erscheinen nach der Installation automatisch in der YForm-Feldausw
 | `fields_inline_switch` | `tinyint(1)` | Boolescher Switch für Listen- & Formularansicht |
 | `fields_inline` | `text`, `mediumtext` | Text/Textarea mit Inline-Editing in der Liste |
 | `fields_inline_number` | `int`, `float`, `decimal` | Zahlenfeld mit Inline-Editing (Präfix/Suffix/Min/Max) |
+| `fields_inline_select` | `varchar(191)`, `text` | Auswahlfeld mit Inline-Editing, Selectpicker, Farben, optionaler Query-Quelle und Lock-Status |
 | `fields_tagging` | `text` | Farbige Tag-Chips als JSON mit WCAG-konformem Farbpicker |
 
 ## Frontend-Ausgabe mit Fragmenten

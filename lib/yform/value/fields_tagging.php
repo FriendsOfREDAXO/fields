@@ -105,6 +105,130 @@ class rex_yform_value_fields_tagging extends rex_yform_value_abstract
         return $output !== [] ? implode('', $output) : '-';
     }
 
+    public static function getSearchField($params): void
+    {
+        /** @var rex_yform_manager_field $field */
+        $field = $params['field'];
+
+        $tags = self::getSearchTags($field);
+        $choices = [
+            '(empty)' => '(empty)',
+            '!(empty)' => rex_i18n::msg('fields_search_not_empty'),
+        ];
+
+        $colorsByValue = [];
+
+        foreach ($tags as $tag) {
+            $text = (string) ($tag['text'] ?? '');
+            if ('' === $text) {
+                continue;
+            }
+
+            $color = (string) ($tag['color'] ?? '#7f8c8d');
+            $choices[$text] = $text;
+            $colorsByValue[$text] = $color;
+        }
+
+        $params['searchForm']->setValueField('choice', [
+            'name' => $field->getName(),
+            'label' => $field->getLabel(),
+            'choices' => $choices,
+            'multiple' => 1,
+            'expanded' => 1,
+            'choice_attributes' => static function (string $value) use ($colorsByValue): array {
+                if (!isset($colorsByValue[$value])) {
+                    return [];
+                }
+
+                $color = $colorsByValue[$value];
+
+                return [
+                    'style' => 'accent-color:' . $color . ';',
+                    'data-tag-color' => $color,
+                ];
+            },
+        ]);
+    }
+
+    public static function getSearchFilter($params)
+    {
+        $value = $params['value'];
+
+        /** @var rex_yform_manager_query $query */
+        $query = $params['query'];
+        $field = $query->getTableAlias() . '.' . $params['field']->getName();
+
+        $self = new self();
+        $values = $self->getArrayFromString($value);
+
+        foreach ($values as $searchValue) {
+            $searchValue = trim((string) $searchValue);
+            if ('' === $searchValue) {
+                continue;
+            }
+
+            switch ($searchValue) {
+                case '(empty)':
+                    $query->whereRaw(
+                        $field . ' IS NULL OR ' . $field . ' = :fields_tagging_empty OR ' . $field . ' = :fields_tagging_empty_json',
+                        [
+                            'fields_tagging_empty' => '',
+                            'fields_tagging_empty_json' => '[]',
+                        ],
+                    );
+                    break;
+                case '!(empty)':
+                    $query->whereRaw(
+                        $field . ' IS NOT NULL AND ' . $field . ' <> :fields_tagging_not_empty AND ' . $field . ' <> :fields_tagging_not_empty_json',
+                        [
+                            'fields_tagging_not_empty' => '',
+                            'fields_tagging_not_empty_json' => '[]',
+                        ],
+                    );
+                    break;
+                default:
+                    $needle = '"text":"' . str_replace('"', '\\"', $searchValue) . '"';
+                    $needle = str_replace(['%', '_'], ['\\%', '\\_'], $needle);
+                    $query->where($field, '%' . $needle . '%', 'LIKE');
+                    break;
+            }
+        }
+
+        return $query;
+    }
+
+    /**
+     * @return list<array{text:string,color:string}>
+     */
+    private static function getSearchTags(rex_yform_manager_field $field): array
+    {
+        $sourceTable = trim((string) $field->getElement('source_table'));
+        $sourceField = trim((string) $field->getElement('source_field'));
+
+        if ('' === $sourceField) {
+            $sourceField = (string) $field->getName();
+        }
+
+        if ('' === $sourceTable) {
+            $sourceTable = trim((string) $field->getElement('table_name'));
+        }
+
+        if ('' === $sourceTable || '' === $sourceField) {
+            return [];
+        }
+
+        $prefix = rex::getTablePrefix();
+        if (str_starts_with($sourceTable, $prefix)) {
+            $sourceTable = substr($sourceTable, strlen($prefix));
+        }
+
+        if ('' === $sourceTable) {
+            return [];
+        }
+
+        return FieldsTagging::collectFromTable($sourceTable, $sourceField);
+    }
+
     /**
      * @return list<array{text:string,color:string}>
      */

@@ -2,6 +2,7 @@
 
 namespace FriendsOfRedaxo\Fields;
 
+use rex;
 use rex_escape;
 use rex_sql;
 use rex_sql_exception;

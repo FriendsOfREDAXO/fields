@@ -23,6 +23,7 @@ fields_tagging_remove = Tag entfernen
 fields_tagging_add_selected = Ausgewählte Vorschläge übernehmen
 fields_tagging_placeholder = Tag eingeben und Enter drücken
 fields_tagging_suggest_title = Vorschläge
+fields_search_not_empty = Nicht leer
 
 # Opening Hours
 fields_opening_hours = Öffnungszeiten
@@ -184,3 +185,14 @@ fields_inline_number_prefix = Präfix
 fields_inline_number_suffix = Suffix
 fields_inline_number_prefix_notice = Text vor dem Eingabefeld (z.B. €)
 fields_inline_number_suffix_notice = Text nach dem Eingabefeld (z.B. km)
+
+# Inline Edit Select
+fields_inline_select_description = Inline Edit Select Feld
+fields_inline_select_query = Query (optional)
+fields_inline_select_query_notice = SQL-Query mit mindestens 1 Spalte (value) und optional 2. Spalte (label)
+fields_inline_select_colors = Farben (optional)
+fields_inline_select_colors_notice = key=#hex (eine pro Zeile), z.B. abgeschlossen=#555555
+fields_inline_select_lock_values = Gesperrte Werte (optional)
+fields_inline_select_lock_values_notice = Komma- oder zeilengetrennte Keys; bei gesetztem Wert sind keine weiteren Änderungen möglich
+fields_inline_select_locked = Dieser Status ist gesperrt und kann nicht mehr geändert werden.
+fields_inline_select_invalid_value = Ungueltiger Wert fuer dieses Auswahlfeld.

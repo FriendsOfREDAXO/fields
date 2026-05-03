@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.2.0 - 2026-05-03
+
+### Added
+
+- **Inline Select** (`fields_inline_select`): Neues YForm-Value fuer direktes Aendern von Auswahlwerten in der Listenansicht, inklusive optionaler Farbdefinitionen, Query-Quelle und Lock-Status fuer finale Werte.
+- **Tagging-Suche** (`fields_tagging`): YForm-Manager-Suchwidget mit Mehrfachauswahl (`expanded=1`) und farbigen Tag-Checkboxen.
+
+### Improved
+
+- `fields_tagging` Search-UX: Klareres Label fuer `!(empty)` via Sprachschluessel (`fields_search_not_empty`) statt technischer Notation.
+- Irrefuehrender Multi-Select-Hinweis („Please use CTRL or COMMAND …“) in der Checkbox-basierten Tag-Suche entfernt.
+
+### Fixed
+
+- `fields_tagging` Suchfilter fuer `(empty)` / `!(empty)` auf robuste SQL-Bedingungen umgestellt (`NULL`, leerer String, `[]`).
+- Namespace-Fix in `FieldsTagging`: korrekte Aufloesung von `rex::getTablePrefix()` durch `use rex;`.
+
 ## 1.1.0 - 2026-03-13
 
 ### Added
