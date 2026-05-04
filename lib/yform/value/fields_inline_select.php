@@ -73,11 +73,11 @@ class rex_yform_value_fields_inline_select extends rex_yform_value_abstract
             'values'      => [
                 'name'    => ['type' => 'name',     'label' => rex_i18n::msg('yform_values_defaults_name')],
                 'label'   => ['type' => 'text',     'label' => rex_i18n::msg('yform_values_defaults_label')],
-                'choices' => ['type' => 'textarea', 'label' => rex_i18n::msg('yform_values_select_choices', 'key=Label'), 'notice' => 'key=Label (eine pro Zeile)'],
+                'choices' => ['type' => 'textarea', 'label' => rex_i18n::msg('fields_inline_select_choices', 'key=Label'), 'notice' => 'key=Label (eine pro Zeile)'],
                 'query'   => ['type' => 'textarea', 'label' => rex_i18n::msg('fields_inline_select_query'), 'notice' => rex_i18n::msg('fields_inline_select_query_notice')],
                 'colors'  => ['type' => 'textarea', 'label' => rex_i18n::msg('fields_inline_select_colors'), 'notice' => rex_i18n::msg('fields_inline_select_colors_notice')],
                 'lock_values' => ['type' => 'text', 'label' => rex_i18n::msg('fields_inline_select_lock_values'), 'notice' => rex_i18n::msg('fields_inline_select_lock_values_notice')],
-                'default' => ['type' => 'text',     'label' => rex_i18n::msg('yform_values_defaults_defaultValue')],
+                'default' => ['type' => 'text',     'label' => rex_i18n::msg('fields_inline_select_default_value')],
                 'no_db'   => ['type' => 'no_db',    'label' => rex_i18n::msg('yform_values_defaults_table'), 'default' => 0],
                 'notice'  => ['type' => 'text',     'label' => rex_i18n::msg('yform_values_defaults_notice')],
             ],

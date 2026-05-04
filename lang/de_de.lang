@@ -188,11 +188,13 @@ fields_inline_number_suffix_notice = Text nach dem Eingabefeld (z.B. km)
 
 # Inline Edit Select
 fields_inline_select_description = Inline Edit Select Feld
+fields_inline_select_choices = Auswahlwerte
 fields_inline_select_query = Query (optional)
 fields_inline_select_query_notice = SQL-Query mit mindestens 1 Spalte (value) und optional 2. Spalte (label)
 fields_inline_select_colors = Farben (optional)
 fields_inline_select_colors_notice = key=#hex (eine pro Zeile), z.B. abgeschlossen=#555555
 fields_inline_select_lock_values = Gesperrte Werte (optional)
 fields_inline_select_lock_values_notice = Komma- oder zeilengetrennte Keys; bei gesetztem Wert sind keine weiteren Änderungen möglich
+fields_inline_select_default_value = Standardwert
 fields_inline_select_locked = Dieser Status ist gesperrt und kann nicht mehr geändert werden.
 fields_inline_select_invalid_value = Ungueltiger Wert fuer dieses Auswahlfeld.

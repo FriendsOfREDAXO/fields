@@ -145,3 +145,7 @@ fields_config_icon_sets = Available icon sets
 fields_config_icon_sets_notice = Comma separated: fontawesome, uikit
 fields_config_qrcode = QR Code settings
 fields_config_saved = Settings saved
+
+# Inline Edit Select
+fields_inline_select_choices = Choices
+fields_inline_select_default_value = Default value

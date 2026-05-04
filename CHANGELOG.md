@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1 - 2026-05-04
+
+### Fixed
+
+- `fields_inline_select`: Übersetzungs-Keys auf addon-spezifische Präfixe umgestellt (`fields_inline_select_choices`, `fields_inline_select_default_value`) statt generischer YForm-Keys.
+
 ## 1.2.0 - 2026-05-03
 
 ### Added
