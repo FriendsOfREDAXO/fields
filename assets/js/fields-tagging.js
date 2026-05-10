@@ -271,9 +271,26 @@ jQuery(function ($) {
         });
     }
 
-    $(document).on('rex:ready pjax:end pjax:success', function (e, container) {
+    // Initialisierung bei verschiedenen Events
+    $(document).on('rex:ready pjax:end pjax:success rex:contentUpdate rex:mediaUpdated', function (e, container) {
         initAll(container || document);
     });
+
+    // Fallback: MutationObserver für dynamisch hinzugefügte Widgets (z.B. Medienpool Modal)
+    if (window.MutationObserver) {
+        var observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+                    $(mutation.addedNodes).each(function () {
+                        if ($(this).find('.fields-tagging-widget').length) {
+                            initAll(this);
+                        }
+                    });
+                }
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
 
     initAll(document);
 });

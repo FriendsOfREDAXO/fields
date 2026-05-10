@@ -298,8 +298,6 @@
                     toggleSwitch(wrapper[0]);
                 }
             });
-            
-            console.log('Fields Inline: Event Delegation initialized');
         } else {
             // Fallback for non-jQuery environments (rare in REDAXO)
             document.addEventListener('DOMContentLoaded', function() {

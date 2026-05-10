@@ -71,7 +71,7 @@ function fields_metainfo_tagging_custom_field(rex_extension_point $ep): void
     $fieldName = str_replace('rex-metainfo-', '', (string) $subject[3]);
     $fieldValue = (string) ($subject['values'][0] ?? '');
     $fieldId = (string) $subject[3];
-    $fieldLabel = (string) $subject[4];
+    $fieldLabel = (string) ($subject[4] ?? '');
     if (preg_match('/<label[^>]*>(.*)<\/label>/i', $fieldLabel, $matches)) {
         $fieldLabel = (string) ($matches[1] ?? $fieldLabel);
     }

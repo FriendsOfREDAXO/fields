@@ -93,7 +93,7 @@ foreach ($tags as $tag) {
 
 #### Troubleshooting
 
-- **Widget wird nicht angezeigt**: Stelle sicher, dass der Feldtyp `"Fields Tagging"` in der Metainfo-Spalte gewählt ist.
+- **Widget wird nicht angezeigt**: Stelle sicher, dass der Feldtyp `"Fields Tagging"` in der Metainfo-Spalte gewählt ist. Es reicht nicht, das Feld zu erstellen – der **Feldtyp muss explizit auf "Fields Tagging"** gestellt sein!
 - **Autocomplete funktioniert nicht**: Prüfe, dass `source_table` und `source_field` korrekt in der Feldkonfiguration gesetzt sind und die Quelltabelle existiert.
 - **Keine Farben sichtbar**: Überprüfe, dass `colors`-Array gültige Hex-Codes enthält (z.B. `#2980b9`).
 - **Tags verschwinden nach dem Speichern**: Stelle sicher, dass die Spalte vom Typ `text` ist und genug Platz für JSON hat.

@@ -1300,7 +1300,6 @@
 
     function initConditionalFields() {
         var rules = document.querySelectorAll('.fields-conditional-rule');
-        console.group('[fields] initConditionalFields – ' + rules.length + ' Regel(n) gefunden');
 
         rules.forEach(function (rule, ruleIdx) {
             var sourceField = rule.dataset.sourceField;
@@ -1309,16 +1308,9 @@
             var targetFields = JSON.parse(rule.dataset.targetFields || '[]');
             var action = rule.dataset.action;
 
-            console.group('[fields] Regel #' + ruleIdx);
-            console.log('  sourceField  :', sourceField);
-            console.log('  operator     :', operator);
-            console.log('  compareValue :', compareValue);
-            console.log('  targetFields :', targetFields);
-            console.log('  action       :', action);
+
 
             if (!sourceField || targetFields.length === 0) {
-                console.warn('  → ABBRUCH: sourceField leer oder keine targetFields');
-                console.groupEnd();
                 return;
             }
 
@@ -1330,8 +1322,7 @@
             var sourceWrapper = ruleScope.querySelector('div[id$="-' + sourceField + '"]');
             var sourceInput = null;
 
-            console.log('  ruleScope    :', ruleScope);
-            console.log('  sourceWrapper:', sourceWrapper);
+
 
             if (sourceWrapper) {
                 // Checkbox/Radio bevorzugen – YForm rendert ein hidden input VOR der echten Checkbox,
@@ -1341,14 +1332,11 @@
                            || sourceWrapper.querySelector('select, textarea')
                            || sourceWrapper.querySelector('input:not([type=hidden])')
                            || sourceWrapper.querySelector('input');
-                console.log('  Inputs im Wrapper:', Array.from(sourceWrapper.querySelectorAll('input, select, textarea')).map(function(el) {
-                    return el.tagName + '[type=' + el.type + '][name=' + el.name + '][value=' + el.value + ']';
-                }));
+
             }
 
             // Fallback für Sonderfälle: Direktes Input-Match falls Wrapper nicht greifbar
             if (!sourceInput) {
-                console.warn('  sourceWrapper nicht gefunden – versuche Fallback via name-Selector (scoped)');
                 sourceInput = ruleScope.querySelector('[name*="[' + sourceField + ']"]');
                 // Auch im Fallback Checkbox bevorzugen
                 if (sourceInput && sourceInput.type === 'hidden') {
@@ -1357,11 +1345,9 @@
                 }
             }
 
-            console.log('  sourceInput  :', sourceInput);
+
 
             if (!sourceInput) {
-                console.error('  → ABBRUCH: kein sourceInput gefunden!');
-                console.groupEnd();
                 return;
             }
 
@@ -1380,7 +1366,7 @@
                     default: match = val === compareValue;
                 }
 
-                console.log('[fields] evaluate – val:', val, '/ operator:', operator, '/ compareValue:', compareValue, '/ match:', match);
+
 
                 if (operator === 'switch') {
                     // Switch Mode: Vergleicht Target-Name/Klasse mit dem aktuellen Wert
@@ -1395,12 +1381,12 @@
                         // Toggle Logic for Switch
                         if (fieldName.startsWith('.') || fieldName.startsWith('#')) {
                             document.querySelectorAll(fieldName).forEach(function(el) {
-                                console.log('[fields] switch CSS selector', fieldName, '→ display:', isMatch ? 'show' : 'hide', el);
+
                                 el.style.display = isMatch ? '' : 'none';
                             });
                         } else {
                             var targetWrapper = document.querySelector('div[id$="-' + fieldName + '"]');
-                            console.log('[fields] switch field', fieldName, '→ wrapper:', targetWrapper, '→ display:', isMatch ? 'show' : 'hide');
+
                             if (targetWrapper) {
                                 targetWrapper.style.display = isMatch ? '' : 'none';
                             }
@@ -1410,7 +1396,7 @@
                 }
 
                 var shouldShow = (action === 'show') ? match : !match;
-                console.log('[fields] shouldShow:', shouldShow, '(action:', action, ')');
+
 
                 targetFields.forEach(function (fieldName) {
                     fieldName = fieldName.trim();
@@ -1419,7 +1405,7 @@
                     // Support CSS Selectors (.class, #id)
                     if (fieldName.startsWith('.') || fieldName.startsWith('#')) {
                         var els = document.querySelectorAll(fieldName);
-                        console.log('[fields] CSS selector', fieldName, '→', els.length, 'Elemente → display:', shouldShow ? 'show' : 'hide');
+
                         els.forEach(function(el) {
                             el.style.display = shouldShow ? '' : 'none';
                         });
@@ -1428,7 +1414,7 @@
 
                     // Target Wrapper finden: Primär über Wrapper ID
                     var targetWrapper = document.querySelector('div[id$="-' + fieldName + '"]');
-                    console.log('[fields] target field', fieldName, '→ wrapper:', targetWrapper, '→ display:', shouldShow ? 'show' : 'hide');
+
 
                     if (targetWrapper) {
                         targetWrapper.style.display = shouldShow ? '' : 'none';
@@ -1439,10 +1425,7 @@
             sourceInput.addEventListener('change', evaluate);
             sourceInput.addEventListener('input', evaluate);
             evaluate(); // Initial
-            console.groupEnd();
         });
-
-        console.groupEnd();
     }
 
     // ============================================================
