@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0 - 2026-05-10
+
+### Added
+
+- **Metainfo Tagging**: Neuer Feldtyp 'Fields Tagging' für die Metainfo-Verwaltung. Ermöglicht farbige Tags mit Autocomplete-Unterstützung aus konfigurierbarer Quelltabelle direkt im Metainfo-Kontext.
+
 ## 1.2.1 - 2026-05-04
 
 ### Fixed

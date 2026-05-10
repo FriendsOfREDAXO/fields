@@ -41,6 +41,17 @@ class FieldsTagging
 
         $data = json_decode($raw, true);
         if (!is_array($data)) {
+            $decodedRaw = html_entity_decode($raw, ENT_QUOTES, 'UTF-8');
+            if ($decodedRaw !== $raw) {
+                $data = json_decode($decodedRaw, true);
+            }
+        }
+
+        if (is_string($data)) {
+            $data = json_decode($data, true);
+        }
+
+        if (!is_array($data)) {
             return [];
         }
 

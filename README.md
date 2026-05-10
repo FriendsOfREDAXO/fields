@@ -4,10 +4,10 @@
 
 Das AddOn **Fields** stellt eine umfangreiche Sammlung zusätzlicher YForm-Value-Feldtypen bereit, die häufig benötigte Eingabemuster und Strukturierungsmöglichkeiten abdecken – von Social-Media-Profilen und Tabellen bis hin zu Tabs, Akkordeons und Grid-Layouts.
 
-## Neu in 1.2.0
+## Neu in 1.3.0
 
-- **Inline Select (`fields_inline_select`)**: Neues Auswahlfeld mit Inline-Bearbeitung in der YForm-Liste, optionalen Farben pro Status und sperrbaren Endstatus-Werten.
-- **Tagging-Suche (`fields_tagging`)**: Erweiterte YForm-Manager-Suche mit Checkbox-Liste, farbigen Tag-Markern und sauberem `(empty)` / `Nicht leer`-Verhalten.
+- **Metainfo Tagging**: Neuer Feldtyp 'Fields Tagging' für die Metainfo-Verwaltung. Ermöglicht farbige Tags mit Autocomplete-Unterstützung aus konfigurierbarer Quelltabelle direkt im Metainfo-Kontext (siehe [Metainfo Tagging](#metainfo-tagging) weiter unten).
+
 
 ## Funktionen
 
@@ -28,6 +28,77 @@ Das Feld `fields_tagging` bringt eine eigene Suchintegration fuer den YForm-Tabl
 - Farbige Marker je Tag in der Auswahl
 - Zusatzauswahl fuer **(empty)** und **Nicht leer**
 - Robuste Filterung fuer `NULL`, leere Strings und `[]`
+
+### Metainfo Tagging
+
+Das AddOn stellt den Feldtyp **"Fields Tagging"** für die Metainfo-Verwaltung zur Verfügung. Damit lassen sich in Artikel, Medien und Kategorien farbige Tags mit Autocomplete verwalten.
+
+#### Schritt-für-Schritt: Metainfo-Feld für Tagging erstellen
+
+1. **Im Backend**: Gehe zu **Verwaltung → Metainfo**
+2. **Neue Spalte**: Klicke auf **Neue Spalte** oder **Neue Spalte hinzufügen**
+3. **Feldkonfiguration**:
+   - **Bezeichnung**: z.B. "Artikel-Tags"
+   - **Feldname**: z.B. `art_tags` (Präfix `art_` = Artikel, `med_` = Medien, `clang_` = Kategorien)
+   - **Feldtyp**: Wähle **"Fields Tagging"** aus der Liste
+   - **Datentyp**: Bleibt auf `text`
+4. **Speichern**: Klick auf Speichern
+5. **In Artikel verwenden**:
+   - Gehe zu einem Artikel
+   - Scrolle zu "Metadaten"
+   - Das neue Tagging-Feld ist jetzt verfügbar
+   - Gib Tags ein, wähle Farben, speichere
+
+#### Konfiguration (Parameter im Metainfo-Feldtyp)
+
+Das Tagging-Feld akzeptiert folgende optionale Parameter im `extra`-Feld:
+
+```json
+{
+  "source_table": "rex_article",
+  "source_field": "art_tags",
+  "max_tags": 20,
+  "colors": ["#2980b9", "#27ae60", "#e74c3c", "#f39c12", "#9b59b6"]
+}
+```
+
+| Parameter | Beschreibung | Beispiel |
+|---|---|---|
+| `source_table` | Tabelle für Autocomplete-Vorschläge | `rex_article` oder `my_custom_table` |
+| `source_field` | Spalte in der Quelltabelle zum Sammeln von Tags | `art_tags` |
+| `max_tags` | Maximale Anzahl Tags pro Datensatz | `20` |
+| `colors` | Verfügbare Farben (Hex-Codes) | `["#2980b9", "#27ae60", ...]` |
+
+#### Beispiel: Tags in der Frontend-Ausgabe
+
+```php
+<?php
+use FriendsOfRedaxo\Fields\FieldsTagging;
+
+// Tags aus Metainfo laden
+$tagsJson = rex_metainfo::getMetaInfo('art_tags', $article_id);
+
+// Als HTML-Chips rendern
+echo FieldsTagging::fromRaw($tagsJson, 'Keine Tags vorhanden');
+
+// Oder manuell decodieren
+$tags = FieldsTagging::decode($tagsJson);
+foreach ($tags as $tag) {
+    echo '<span style="background-color: ' . rex_escape($tag['color']) . '; padding: 4px 8px; border-radius: 12px; color: white;">'
+         . rex_escape($tag['text'])
+         . '</span> ';
+}
+?>
+```
+
+#### Troubleshooting
+
+- **Widget wird nicht angezeigt**: Stelle sicher, dass der Feldtyp `"Fields Tagging"` in der Metainfo-Spalte gewählt ist.
+- **Autocomplete funktioniert nicht**: Prüfe, dass `source_table` und `source_field` korrekt in der Feldkonfiguration gesetzt sind und die Quelltabelle existiert.
+- **Keine Farben sichtbar**: Überprüfe, dass `colors`-Array gültige Hex-Codes enthält (z.B. `#2980b9`).
+- **Tags verschwinden nach dem Speichern**: Stelle sicher, dass die Spalte vom Typ `text` ist und genug Platz für JSON hat.
+
+
 
 ### Komplexe Datentypen (Repeater & Strukturen)
 - **Tabelle** – Barrierefreier Tabelleneditor mit flexiblen Spalten/Zeilen, Min/Max-Constraints und erweiterten Datentypen (Medien, Links, Textarea)
@@ -373,14 +444,49 @@ Mit dem Feldtyp `fields_inline` können Text- und Textarea-Felder in der YForm-T
 
 Der Feldtyp **`fields_tagging`** ermöglicht die Vergabe farbiger Schlagwörter direkt im YForm-Formular. Tags werden als JSON gespeichert und tragen jeweils einen Text und eine Farbe.
 
+Das gleiche Tagging-Widget steht auch als Metainfo-Feld zur Verfügung. Dort kann der Typ `Fields Tagging` gewählt werden; optionale Vorschlagsdaten lassen sich ueber den Feld-Parameter `params` setzen, z.B. `source_table=rex_products&source_field=tags&max_tags=5`.
+
+Für Metainfo ist am einfachsten die Spalte als Vorschlagsquelle zu nehmen, in der bereits Tags gespeichert werden. Beispiel fuer eine Artikel-Metainfo-Spalte:
+
+`source_table=rex_article&source_field=art_tags`
+
+Wenn du im Metainfo-Feld nichts einträgst, versucht das Widget die passende Quelltabelle automatisch aus dem Feldnamen abzuleiten. Bei `art_` wird also `rex_article`, bei `med_` `rex_media` und bei `clang_` `rex_clang` verwendet.
+
+Das funktioniert genauso fuer globale Metainfo-Felder auf Artikeln, Medien, Kategorien oder Sprachen. Wenn keine Quelle gepflegt ist, bleibt das Feld trotzdem speicherbar, nur die Vorschläge werden nicht geladen.
+
 **DB-Typ:** `text`  
 **Datenformat:** `[{"text":"php","color":"#2980b9"}, ...]`
+
+### Schritt-fuer-Schritt: Verwendung als Metainfo-Feld
+
+1. Metainfo-Feld anlegen:
+    - Prefix passend zum Kontext waehlen (`art_`, `med_`, `clang_`)
+    - Spaltenname setzen, z.B. `tags` (ergibt z.B. `art_tags`)
+    - Feldtyp auf `Fields Tagging` setzen
+
+2. Parameter setzen (optional, aber empfohlen):
+    - Im Feld **Parameter** eintragen, z.B. `source_table=rex_article&source_field=art_tags`
+    - Optional begrenzen: `max_tags=5`
+    - Komplettbeispiel: `source_table=rex_article&source_field=art_tags&max_tags=5`
+
+3. Feld speichern und im Objekt bearbeiten:
+    - Im Artikel/Medium/Sprache Tags ueber den Button `Tags bearbeiten` setzen
+    - Mit `Metadaten aktualisieren` speichern
+
+4. Ergebnis pruefen:
+    - Nach dem Reload muessen die gespeicherten Chips wieder sichtbar sein
+    - In der Datenbank steht der Wert als JSON in der Metainfo-Spalte (z.B. `art_tags`)
+
+5. Wenn keine Vorschlaege erscheinen:
+    - Quelle pruefen (`source_table` + `source_field`)
+    - Es muessen in der Quelle bereits Datensaetze mit Tags vorhanden sein
+    - Ohne konfigurierte Quelle bleibt das Speichern moeglich, nur die Vorschlagsliste bleibt leer
 
 ### Einrichtung im Table Manager
 
 | Parameter | Beschreibung |
 |---|---|
-| `source_table` | Tabelle aus der Vorschläge geladen werden (ohne Prefix, z.B. `rex_products`) |
+| `source_table` | Tabelle fuer Vorschlaege (mit oder ohne `rex_` Prefix, z.B. `rex_article` oder `article`) |
 | `source_field` | Spaltenname der Quelle |
 | `max_tags` | Maximale Tag-Anzahl (0 = unbegrenzt) |
 | `notice` | Hinweistext unter dem Feld |

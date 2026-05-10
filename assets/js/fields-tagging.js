@@ -271,8 +271,8 @@ jQuery(function ($) {
         });
     }
 
-    $(document).on('rex:ready', function (e, container) {
-        initAll(container);
+    $(document).on('rex:ready pjax:end pjax:success', function (e, container) {
+        initAll(container || document);
     });
 
     initAll(document);

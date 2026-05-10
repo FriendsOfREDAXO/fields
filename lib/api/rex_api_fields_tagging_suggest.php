@@ -37,6 +37,10 @@ class rex_api_fields_tagging_suggest extends rex_api_function
             exit;
         }
 
+        if ($table !== '' && !str_starts_with($table, rex::getTablePrefix())) {
+            $table = rex::getTable($table);
+        }
+
         // Table / field existence check
         $columns = rex_sql::showColumns($table);
         if ($columns === []) {
