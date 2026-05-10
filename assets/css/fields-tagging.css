@@ -1,6 +1,44 @@
 /* ============================================================
-   Fields Tagging Widget
+   Fields Tagging Widget – CSS Variables für Dark Mode
    ============================================================ */
+
+.fields-tagging-widget {
+    /* Light defaults */
+    --ft-chip-text: #ffffff;
+    --ft-chip-shadow: rgba(0, 0, 0, 0.18);
+    --ft-panel-bg: #ffffff;
+    --ft-panel-border: #ddd;
+    --ft-label-color: #888;
+    --ft-sep-color: #ddd;
+    --ft-panel-footer-border: #eee;
+    --ft-error-color: #e74c3c;
+}
+
+/* Dark mode: Explicit */
+body.rex-theme-dark .fields-tagging-widget {
+    --ft-chip-text: #ffffff;
+    --ft-chip-shadow: rgba(0, 0, 0, 0.3);
+    --ft-panel-bg: #2a2d35;
+    --ft-panel-border: #444;
+    --ft-label-color: #999;
+    --ft-sep-color: #555;
+    --ft-panel-footer-border: #444;
+    --ft-error-color: #ff7675;
+}
+
+/* Dark mode: Auto (@media) – Must mirror explicit dark values */
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .fields-tagging-widget {
+        --ft-chip-text: #ffffff;
+        --ft-chip-shadow: rgba(0, 0, 0, 0.3);
+        --ft-panel-bg: #2a2d35;
+        --ft-panel-border: #444;
+        --ft-label-color: #999;
+        --ft-sep-color: #555;
+        --ft-panel-footer-border: #444;
+        --ft-error-color: #ff7675;
+    }
+}
 
 /* --- Chip-Anzeige ----------------------------------------- */
 .fields-tagging-chips {
@@ -18,11 +56,11 @@
     gap: 5px;
     padding: 3px 10px 3px 10px;
     border-radius: 12px;
-    color: #fff !important;
+    color: var(--ft-chip-text) !important;
     font-size: 12px;
     font-weight: 500;
     line-height: 1.4;
-    box-shadow: 0 1px 3px rgba(0,0,0,.18);
+    box-shadow: 0 1px 3px var(--ft-chip-shadow);
     transition: opacity .15s;
 }
 
@@ -50,24 +88,10 @@
 .fields-tagging-panel {
     margin-top: 8px;
     padding: 14px 16px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--ft-panel-border);
     border-radius: 6px;
-    background: #fff;
-    box-shadow: 0 3px 10px rgba(0,0,0,.08);
-}
-
-body.rex-theme-dark .fields-tagging-panel {
-    --ft-panel-bg: #2a2d35;
-    --ft-panel-border: #444;
     background: var(--ft-panel-bg);
-    border-color: var(--ft-panel-border);
-}
-
-@media (prefers-color-scheme: dark) {
-    body.rex-has-theme:not(.rex-theme-light) .fields-tagging-panel {
-        background: #2a2d35;
-        border-color: #444;
-    }
+    box-shadow: 0 3px 10px rgba(0,0,0,.08);
 }
 
 /* --- Farbpalette ------------------------------------------- */
@@ -81,7 +105,7 @@ body.rex-theme-dark .fields-tagging-panel {
 
 .fields-tagging-palette-label {
     font-size: 12px;
-    color: #888;
+    color: var(--ft-label-color);
     margin-right: 2px;
     white-space: nowrap;
 }
@@ -125,7 +149,7 @@ body.rex-theme-dark .fields-tagging-panel {
 
 .fields-tagging-suggestions-label {
     font-size: 11px;
-    color: #999;
+    color: var(--ft-label-color);
     margin-bottom: 6px;
     text-transform: uppercase;
     letter-spacing: .04em;
@@ -143,12 +167,12 @@ body.rex-theme-dark .fields-tagging-panel {
     align-items: center;
     padding: 3px 10px;
     border-radius: 12px;
-    color: #fff !important;
+    /* Text-Farbe wird dynamisch via JS gesetzt basierend auf Hintergrundkontrast */
     font-size: 12px;
     cursor: pointer;
     opacity: .75;
-    transition: opacity .15s, transform .1s;
-    box-shadow: 0 1px 3px rgba(0,0,0,.15);
+    transition: opacity .15s, transform .1s, color .1s;
+    box-shadow: 0 1px 3px var(--ft-chip-shadow);
     border: none;
     outline: none;
 }
@@ -168,20 +192,10 @@ body.rex-theme-dark .fields-tagging-panel {
 .fields-tagging-palette-sep {
     width: 1px;
     height: 20px;
-    background: #ddd;
+    background: var(--ft-sep-color);
     margin: 0 4px;
     display: inline-block;
     align-self: center;
-}
-
-body.rex-theme-dark .fields-tagging-palette-sep {
-    background: #555;
-}
-
-@media (prefers-color-scheme: dark) {
-    body.rex-has-theme:not(.rex-theme-light) .fields-tagging-palette-sep {
-        background: #555;
-    }
 }
 
 .fields-tagging-custom-color {
@@ -201,24 +215,14 @@ body.rex-theme-dark .fields-tagging-palette-sep {
 }
 
 .fields-tagging-custom-color.fields-tagging-color-invalid {
-    border-color: #e74c3c;
-    box-shadow: 0 0 0 2px rgba(231,76,60,.3);
+    border-color: var(--ft-error-color);
+    box-shadow: 0 0 0 2px rgba(231, 76, 60, .3);
 }
 
 .fields-tagging-contrast-hint {
     font-size: 11px;
-    color: #e74c3c;
+    color: var(--ft-error-color);
     align-self: center;
-}
-
-body.rex-theme-dark .fields-tagging-contrast-hint {
-    color: #ff7675;
-}
-
-@media (prefers-color-scheme: dark) {
-    body.rex-has-theme:not(.rex-theme-light) .fields-tagging-contrast-hint {
-        color: #ff7675;
-    }
 }
 
 /* --- Footer ----------------------------------------------- */
@@ -226,15 +230,5 @@ body.rex-theme-dark .fields-tagging-contrast-hint {
     display: flex;
     align-items: center;
     padding-top: 8px;
-    border-top: 1px solid #eee;
-}
-
-body.rex-theme-dark .fields-tagging-panel-footer {
-    border-color: #444;
-}
-
-@media (prefers-color-scheme: dark) {
-    body.rex-has-theme:not(.rex-theme-light) .fields-tagging-panel-footer {
-        border-color: #444;
-    }
+    border-top: 1px solid var(--ft-panel-footer-border);
 }

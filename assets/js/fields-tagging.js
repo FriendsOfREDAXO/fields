@@ -21,6 +21,14 @@ jQuery(function ($) {
         return whiteContrast(hex) >= 3.0;
     }
 
+    // Textfarbe für Tag basierend auf Hintergrundkontrast berechnen
+    function getTagTextColor(bgColor) {
+        if (okForWhiteText(bgColor)) {
+            return '#ffffff';
+        }
+        return '#2c3e50'; // Dark text für helle Hintergründe
+    }
+
     // ─── Widget initialisieren ───────────────────────────────────────────
     function initWidget(el) {
         var $el          = $(el);
@@ -136,10 +144,12 @@ jQuery(function ($) {
                     return;
                 }
                 $.each(data.tags, function (i, tag) {
+                    var textColor = getTagTextColor(tag.color);
                     $('<button type="button" class="fields-tagging-suggestion-chip">')
                         .data('text', tag.text)
                         .data('color', tag.color)
                         .css('background', tag.color)
+                        .css('color', textColor)
                         .text(tag.text)
                         .appendTo($suggestions);
                 });
