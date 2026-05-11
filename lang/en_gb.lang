@@ -1,6 +1,6 @@
 fields_title = Fields
 fields_config = Settings
-fields_info = Info & Help
+fields_help = Help
 
 # Social Web Repeater
 fields_social_web = Social Web

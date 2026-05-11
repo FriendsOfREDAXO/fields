@@ -8,6 +8,8 @@
 
 $addon = rex_addon::get('fields');
 
+echo rex_view::title(rex_i18n::msg('yform'));
+
 // Formular erstellen
 $form = rex_config_form::factory('fields');
 

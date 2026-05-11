@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.3.1 - 2026-05-11
+
+### Changed
+
+- Backend-Menue: Fields wird nicht mehr als eigener Hauptmenuepunkt gefuehrt, sondern als Unterseite von **YForm** eingehaengt (analog `yform_spam_protection`).
+- Hilfe-Seite: README.md wird ueber `rex_markdown::parseWithToc()` mit Inhaltsverzeichnis und PHP-Highlighting gerendert (Core-Pattern aus `packages.help.php`).
+- README.md neu strukturiert: Einleitung, Features, Anwendung im Tablemanager, Anwendung im Metainfo-AddOn, Entwickler-Sektion (Fragmente, FieldsTagging-Helper, API, JSON-Schemata).
+
+### Removed
+
+- Veraltete Seite `pages/info.php` entfernt (durch package.yml + README-Help-Page ersetzt).
+
 ## 1.3.0 - 2026-05-10
 
 ### Added
