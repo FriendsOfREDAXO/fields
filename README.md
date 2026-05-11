@@ -171,50 +171,77 @@ Aktuell stellt **Fields** für das Metainfo-AddOn genau einen Feldtyp bereit: **
 
 # Für Entwickler
 
-## Frontend-Ausgabe via Fragmente
+Dieser Abschnitt dokumentiert vollständig:
 
-Für jedes Feld stehen Fragmente in vier Framework-Varianten bereit:
+1. Wie die mitgelieferten **Fragmente** im Frontend eingebunden werden (inkl. aller `setVar`-Variablen).
+2. **Verarbeitungsbeispiele** für typische Modul-/Template-Aufgaben (Auslesen, Filtern, Eigene Ausgabe).
+3. Eine **API-Referenz** aller öffentlichen Methoden der Helper-Klassen und Feldklassen.
+4. Alle **REX-API-Endpunkte** (`rex-api-call=...`) mit Request- und Response-Format.
 
-- `fields/bootstrap3/` – Bootstrap 3
-- `fields/uikit3/` – UIkit 3
-- `fields/tailwind/` – Tailwind CSS
-- `fields/plain/` – Framework-unabhängig (semantisches HTML)
+---
 
-### Social Web
+## 1. Frontend-Ausgabe via Fragmente
+
+Für jedes Feld mit Frontend-Output stehen Fragmente in vier Framework-Varianten bereit. Der Aufruf erfolgt immer nach demselben Muster:
+
+```php
+$fragment = new rex_fragment();
+$fragment->setVar('json', $item->getValue('feldname'));
+echo $fragment->parse('fields/<framework>/<feld>.php');
+```
+
+| Variante | Pfad-Prefix | Hinweise |
+|---|---|---|
+| Bootstrap 3 | `fields/bootstrap3/` | Standard im REDAXO-Backend, viele REDAXO-Themes |
+| UIkit 3 | `fields/uikit3/` | Für UIkit-basierte Frontends |
+| Tailwind | `fields/tailwind/` | Utility-Klassen, keine eigenen CSS-Dateien nötig |
+| Plain HTML | `fields/plain/` | Framework-unabhängig, semantische Auszeichnung |
+
+> **Hinweis:** Bei `opening_hours` erwarten die Fragmente **kein `json`**, sondern eine fertige `OpeningHoursHelper`-Instanz – siehe unten.
+
+### 1.1 Social Web – `fields/<framework>/social_web.php`
+
+| Variable | Typ | Default | Beschreibung |
+|---|---|---|---|
+| `json` | string | `''` | JSON-String aus `$item->getValue('social_web')` |
+| `icon_set` | string | `fontawesome` | `fontawesome` oder `uikit` |
+| `class` | string | `''` | Zusätzliche CSS-Klasse für den Wrapper |
 
 ```php
 $fragment = new rex_fragment();
 $fragment->setVar('json', $item->getValue('social_web'));
+$fragment->setVar('icon_set', 'fontawesome');
 $fragment->setVar('class', 'my-social-links');
 echo $fragment->parse('fields/uikit3/social_web.php');
 ```
 
-### Öffnungszeiten
+### 1.2 Öffnungszeiten – `fields/<framework>/opening_hours.php`
 
-```php
-$fragment = new rex_fragment();
-$fragment->setVar('json', $item->getValue('opening_hours'));
-$fragment->setVar('show_status', true);
-echo $fragment->parse('fields/bootstrap3/opening_hours.php');
-```
-
-Zusätzliche Hilfsmethoden über `OpeningHoursHelper`:
+| Variable | Typ | Default | Beschreibung |
+|---|---|---|---|
+| `helper` | `OpeningHoursHelper` | — | **Pflichtparameter**: Helper-Instanz, NICHT JSON |
+| `show_status` | bool | `true` | Aktuellen Öffnungsstatus oben anzeigen |
+| `grouped` | bool | `true` | Wochentage mit gleichen Zeiten zusammenfassen (Mo–Fr) |
+| `show_special` | bool | `true` | Sonderöffnungszeiten ausgeben |
 
 ```php
 use FriendsOfRedaxo\Fields\OpeningHoursHelper;
 
-$data = json_decode($item->getValue('opening_hours'), true);
-$helper = new OpeningHoursHelper($data);
+$helper = new OpeningHoursHelper($item->getValue('opening_hours'), 'de');
 
-if ($helper->isOpenNow()) {
-    echo 'Jetzt geöffnet';
-}
-
-$today   = $helper->getToday();
-$grouped = $helper->getRegularGrouped(); // Mo–Fr zusammengefasst wenn gleich
+$fragment = new rex_fragment();
+$fragment->setVar('helper', $helper, false); // false = kein Escaping (Objekt!)
+$fragment->setVar('show_status', true);
+$fragment->setVar('grouped', true);
+$fragment->setVar('show_special', true);
+echo $fragment->parse('fields/bootstrap3/opening_hours.php');
 ```
 
-### Tabelle
+### 1.3 Tabelle – `fields/<framework>/table.php`
+
+| Variable | Typ | Default | Beschreibung |
+|---|---|---|---|
+| `json` | string | `''` | JSON-String aus `$item->getValue('table')` |
 
 ```php
 $fragment = new rex_fragment();
@@ -222,46 +249,86 @@ $fragment->setVar('json', $item->getValue('table'));
 echo $fragment->parse('fields/bootstrap3/table.php');
 ```
 
-Funktionen des Editors:
-- Definierbare **Min/Max-Grenzen** für Zeilen/Spalten
-- Unabhängige **Textausrichtung** für Kopf- und Datenzellen
-- **Inline-Hinzufügen** von Zeilen/Spalten
-- Strict Mode für Kopfzeilen/-spalten
-- Erweiterte Datentypen: Medien (REX_MEDIA), Links (REX_LINK), Textarea, Zahlen
+Editor-Funktionen: Min/Max-Grenzen für Zeilen/Spalten, unabhängige Textausrichtung Kopf-/Datenzellen, Inline-Hinzufügen, Strict Mode, erweiterte Spaltentypen (Medien `REX_MEDIA`, Links `REX_LINK`, Textarea, Zahlen).
 
-### Kontakte
+### 1.4 Kontakte – `fields/<framework>/contacts.php`
+
+| Variable | Typ | Default | Beschreibung |
+|---|---|---|---|
+| `json` | string | `''` | JSON aus `$item->getValue('contacts')` |
+| `class` | string | `''` | Zusatzklasse für den Wrapper |
 
 ```php
 $fragment = new rex_fragment();
 $fragment->setVar('json', $item->getValue('contacts'));
+$fragment->setVar('class', 'team-cards');
 echo $fragment->parse('fields/tailwind/contacts.php');
 ```
 
-### FAQ mit Schema.org
+### 1.5 FAQ – `fields/<framework>/faq.php`
+
+| Variable | Typ | Default | Beschreibung |
+|---|---|---|---|
+| `json` | string | `''` | JSON aus `$item->getValue('faq')` |
+| `schema` | bool | `true` | Schema.org-`FAQPage`-JSON-LD im Output mitliefern |
+| `class` | string | `''` | Zusatzklasse |
+| `id` | string | `fields-faq-<rand>` | DOM-ID-Präfix (Bootstrap-Akkordeon-Gruppen) |
 
 ```php
 $fragment = new rex_fragment();
 $fragment->setVar('json', $item->getValue('faq'));
-$fragment->setVar('schema', true); // Schema.org FAQPage ausgeben
-echo $fragment->parse('fields/uikit3/faq.php');
+$fragment->setVar('schema', true);
+$fragment->setVar('id', 'faq-produktinfo');
+echo $fragment->parse('fields/bootstrap3/faq.php');
 ```
 
-JSON-LD separat erzeugen:
+JSON-LD separat (z. B. nur im `<head>`) ausgeben:
 
 ```php
-$items = json_decode($item->getValue('faq'), true);
-echo rex_yform_value_fields_faq::getSchemaJsonLd($items);
+echo rex_yform_value_fields_faq::getSchemaJsonLd($item->getValue('faq'));
 ```
 
-### IBAN
+### 1.6 Star Rating – `fields/<framework>/rating.php`
+
+| Variable | Typ | Default | Beschreibung |
+|---|---|---|---|
+| `value` | int | `0` | Aktuelle Bewertung |
+| `max` | int | `5` | Maximale Sterne |
+| `color` | string | `#ffc107` | Farbe der gefüllten Sterne (Bootstrap/UIkit) |
+| `icon_full` | string | `fa fa-star` | CSS-Klasse für gefüllten Stern (Bootstrap/UIkit) |
+| `icon_empty` | string | `fa fa-star-o` | CSS-Klasse für leeren Stern |
+| `char_full` | string | `★` | Zeichen für gefüllten Stern (nur `plain`) |
+| `char_empty` | string | `☆` | Zeichen für leeren Stern (nur `plain`) |
+| `class` | string | `''` | Zusatzklasse |
 
 ```php
-$isValid = rex_yform_value_fields_iban::isValidFormat('DE89370400440532013000');
+$fragment = new rex_fragment();
+$fragment->setVar('value', (int) $item->getValue('rating'));
+$fragment->setVar('max', 5);
+$fragment->setVar('color', '#f39c12');
+echo $fragment->parse('fields/bootstrap3/rating.php');
 ```
 
-Die Validierung läuft über openIBAN.com und wird serverseitig geproxied, damit der API-Key nicht im Frontend liegt.
+### 1.7 QR-Code – `fields/<framework>/qrcode.php`
 
-### Icon Picker
+| Variable | Typ | Default | Beschreibung |
+|---|---|---|---|
+| `content` | string | `''` | Zu kodierender Inhalt (URL, vCard, Text) |
+| `size` | int | `200` | Kantenlänge in Pixeln |
+| `label` | string | `''` | Optionaler Beschriftungstext unter dem Code |
+| `class` | string | `''` | Zusatzklasse |
+
+```php
+$fragment = new rex_fragment();
+$fragment->setVar('content', 'https://example.com');
+$fragment->setVar('size', 256);
+$fragment->setVar('label', 'Zur Website');
+echo $fragment->parse('fields/plain/qrcode.php');
+```
+
+### 1.8 Icon Picker (manuelle Ausgabe)
+
+Für `fields_icon_picker` existiert kein eigenes Fragment – der gespeicherte Wert ist eine CSS-Klasse:
 
 ```php
 $icon = $item->getValue('icon');
@@ -271,113 +338,269 @@ echo '<i class="' . rex_escape($icon) . '"></i>';
 echo '<span uk-icon="icon: ' . rex_escape(str_replace('uk-icon-', '', $icon)) . '"></span>';
 ```
 
-### Star Rating
+### 1.9 IBAN (manuelle Ausgabe)
 
 ```php
-$fragment = new rex_fragment();
-$fragment->setVar('value', $item->getValue('rating'));
-$fragment->setVar('max', 5);
-echo $fragment->parse('fields/bootstrap3/rating.php');
-```
-
-### Conditional (Bedingte Felder)
-
-Keine Frontend-Ausgabe – steuert nur Sichtbarkeit im Backend:
-
-- **Quellfeld**: Feld, dessen Wert geprüft wird
-- **Operator**: `==`, `!=`, `>`, `<`, `contains`, `empty`, `!empty`, `switch`
-- **Vergleichswert**: erwarteter Wert (bei `switch` irrelevant)
-- **Zielfelder**: Feldnamen ODER CSS-Selektoren, kommasepariert
-- **Aktion**: `show` oder `hide`
-
-### Tabs / Akkordeons (`fields_interactive`)
-
-1. Feld `fields_interactive` anlegen
-2. Typ wählen (Tab Start, Akkordeon Start, Gruppe Ende)
-3. Gleiche **Gruppen-ID** für zusammengehörige Elemente vergeben
-
-Beispiel:
-1. `fields_interactive` (Tab, Label „Basisdaten“, Gruppen-ID 1)
-2. … Felder für Tab 1 …
-3. `fields_interactive` (Tab, Label „Erweitert“, Gruppen-ID 1)
-4. … Felder für Tab 2 …
-5. `fields_interactive` (Ende, Gruppen-ID 1)
-
-### Grid (`fields_structure`)
-
-- **Start**: beginnt einen Grid-Container
-- **Layout**: Spalten via Grid-Template (z. B. `1fr 1fr` oder `1fr 2fr`)
-- **Gap**: Abstand zwischen Spalten
-- Alle Felder zwischen Start und Ende werden ins Grid aufgenommen
-
----
-
-## Tagging: Daten auslesen & verwenden
-
-Die Hilfsklasse `FriendsOfRedaxo\Fields\FieldsTagging` ist automatisch geladen.
-
-```php
-use FriendsOfRedaxo\Fields\FieldsTagging;
-
-// Aus YForm-Dataset
-$tags  = FieldsTagging::decode($item->getValue('tags'));
-$texte = FieldsTagging::getTexts($tags);
-
-// Aus Metainfo (Artikel/Medium/Kategorie)
-$tagsJson = rex_metainfo::getMetaInfo('art_tags', $article_id);
-echo FieldsTagging::fromRaw($tagsJson, 'Keine Tags vorhanden');
-
-// HTML-Ausgabe
-echo FieldsTagging::toHtml($tags);
-echo FieldsTagging::chipHtml('php', '#2980b9');
-
-// Encoding nach manueller Manipulation
-$json = FieldsTagging::encode($tags);
-```
-
-### Datenbankabfragen
-
-```php
-use FriendsOfRedaxo\Fields\FieldsTagging;
-
-// Alle eindeutigen Tags einer Spalte
-$alleTags = FieldsTagging::collectFromTable('rex_products', 'tags');
-$texte    = FieldsTagging::collectTextsFromTable('rex_products', 'tags');
-
-// SQL-WHERE für MySQL JSON-Suche (>= 5.7)
-$sql = rex_sql::factory();
-$rows = $sql->getArray(
-    'SELECT * FROM rex_products WHERE ' . FieldsTagging::sqlHasTag('tags', 'php')
-);
-
-// PHP-Filter
-$gefiltert = FieldsTagging::filterByTag($rows, 'tags', 'php');
-```
-
-### Manuelle Frontend-Ausgabe
-
-```php
-use FriendsOfRedaxo\Fields\FieldsTagging;
-
-$tags = FieldsTagging::decode($item->getValue('tags'));
-foreach ($tags as $tag) {
-    echo '<span style="background-color:' . rex_escape($tag['color']) . ';padding:4px 8px;border-radius:12px;color:#fff;">'
-       . rex_escape($tag['text'])
-       . '</span> ';
+$iban = $item->getValue('iban');
+if (rex_yform_value_fields_iban::isValidFormat($iban)) {
+    echo rex_escape(trim(chunk_split($iban, 4, ' ')));
 }
 ```
 
+### 1.10 Backend-Only-Felder
+
+`fields_conditional`, `fields_interactive`, `fields_structure` haben **keine Frontend-Ausgabe**. Die Inline-Felder (`fields_inline*`, `fields_inline_switch`) speichern einfache Skalarwerte:
+
+```php
+echo rex_escape($item->getValue('beschreibung_inline'));    // Text
+echo (int) $item->getValue('aktiv');                        // Switch
+echo number_format((float) $item->getValue('preis'), 2);    // Zahl
+```
+
 ---
 
-## API-Endpunkte
+## 2. Verarbeitungsbeispiele
 
-### IBAN-Validierung
+Praxisrezepte für typische Modul-/Template-Aufgaben.
+
+### 2.1 Eine Liste filtern (Tagging)
+
+Alle Datensätze ausgeben, die das Tag `php` enthalten – einmal per SQL (effizient), einmal per PHP (für gemischte Quellen):
+
+```php
+use FriendsOfRedaxo\Fields\FieldsTagging;
+
+// Variante A: SQL (MySQL >= 5.7) – idealerweise mit YOrm Query
+$sql  = rex_sql::factory();
+$rows = $sql->getArray(
+    'SELECT * FROM ' . rex::getTable('produkte')
+    . ' WHERE ' . FieldsTagging::sqlHasTag('tags', 'php'),
+);
+
+// Variante B: PHP-seitig auf bereits geladenen Daten
+$rows = rex_yform_manager_dataset::query('rex_produkte')->find()->toArray();
+$rows = FieldsTagging::filterByTag($rows, 'tags', 'php');
+```
+
+### 2.2 Tag-Cloud aller Tags einer Tabelle
+
+```php
+use FriendsOfRedaxo\Fields\FieldsTagging;
+
+$tags = FieldsTagging::collectFromTable('produkte', 'tags');
+echo FieldsTagging::toHtml($tags, 'Noch keine Tags');
+```
+
+### 2.3 Aktuellen Öffnungsstatus im Header anzeigen
+
+```php
+use FriendsOfRedaxo\Fields\OpeningHoursHelper;
+
+$helper = new OpeningHoursHelper($item->getValue('opening_hours'), 'de');
+$status = $helper->getCurrentStatus();
+
+$cssClass = $status['is_open'] ? 'badge-success' : 'badge-secondary';
+echo '<span class="badge ' . $cssClass . '">'
+   . rex_escape($status['label']);
+if ($status['next_change_label']) {
+    echo ' – ' . rex_escape($status['next_change_label']);
+}
+echo '</span>';
+```
+
+### 2.4 FAQ mit Schema.org-Markup im Template
+
+```php
+$faqJson = $item->getValue('faq');
+
+// JSON-LD in den <head>
+rex_extension::register('OUTPUT_FILTER', function (rex_extension_point $ep) use ($faqJson) {
+    $jsonLd = rex_yform_value_fields_faq::getSchemaJsonLd($faqJson);
+    return str_replace('</head>', $jsonLd . '</head>', $ep->getSubject());
+});
+
+// Sichtbare Ausgabe im Artikel
+$fragment = new rex_fragment();
+$fragment->setVar('json', $faqJson);
+$fragment->setVar('schema', false); // schema schon im head
+echo $fragment->parse('fields/bootstrap3/faq.php');
+```
+
+### 2.5 Social-Web-Profile in einer eigenen Schleife rendern
+
+```php
+$social = json_decode($item->getValue('social_web') ?: '[]', true);
+foreach ($social as $entry) {
+    printf(
+        '<a href="%s" rel="me" style="color:%s"><i class="%s"></i> %s</a>',
+        rex_escape($entry['url']),
+        rex_escape($entry['color']),
+        rex_escape($entry['icon']),
+        rex_escape($entry['label'] ?: $entry['platform']),
+    );
+}
+```
+
+### 2.6 Tabelle aus Code befüllen und ausgeben
+
+```php
+$tableData = [
+    'caption'        => 'Preisliste 2026',
+    'has_header_row' => true,
+    'has_header_col' => false,
+    'rows' => [
+        ['Produkt', 'Menge', 'Preis'],
+        ['Stuhl', '1', '199,00 €'],
+        ['Tisch', '1', '499,00 €'],
+    ],
+];
+
+$fragment = new rex_fragment();
+$fragment->setVar('json', json_encode($tableData));
+echo $fragment->parse('fields/bootstrap3/table.php');
+```
+
+### 2.7 Inline-Update programmgesteuert auslösen (JavaScript)
+
+Felder mit Inline-Editing senden automatisch ein DOM-Event `YFORM_DATA_UPDATED`. So lässt sich z. B. das URL-AddOn benachrichtigen:
+
+```js
+document.addEventListener('YFORM_DATA_UPDATED', (e) => {
+    console.log('Update', e.detail); // { table, field, id, value }
+});
+```
+
+### 2.8 Eigene Tagging-Suchquelle (Metainfo + YForm gemischt)
+
+```php
+use FriendsOfRedaxo\Fields\FieldsTagging;
+
+$artikelTags = FieldsTagging::collectFromTable('article', 'art_tags');
+$produktTags = FieldsTagging::collectFromTable('produkte', 'tags');
+
+// zusammenführen, nach Text deduplizieren
+$alle = array_merge($artikelTags, $produktTags);
+$seen = [];
+$alle = array_filter($alle, function ($t) use (&$seen) {
+    $k = mb_strtolower($t['text']);
+    if (isset($seen[$k])) return false;
+    return $seen[$k] = true;
+});
+```
+
+---
+
+## 3. API-Referenz – PHP-Klassen
+
+### 3.1 `FriendsOfRedaxo\Fields\FieldsTagging`
+
+Statischer Helper für das Tagging-Feldformat `[{text,color}, …]`.
+
+| Methode | Signatur | Zweck |
+|---|---|---|
+| `decode` | `decode(string $raw): array` | JSON aus DB → normalisiertes Tags-Array (dedupliziert, validierte Farben) |
+| `encode` | `encode(array $tags): string` | Tags-Array → JSON-String für die DB |
+| `getTexts` | `getTexts(array $tags): array` | Nur die Tag-Texte als Liste |
+| `toHtml` | `toHtml(array $tags, string $emptyText = ''): string` | Tags als farbige Chip-Spans |
+| `chipHtml` | `chipHtml(string $text, string $color = ''): string` | Einzelnen Chip-Span rendern |
+| `fromRaw` | `fromRaw(string $raw, string $emptyText = ''): string` | Kurzform von `toHtml(decode($raw))` |
+| `collectFromTable` | `collectFromTable(string $table, string $field): array` | Alle eindeutigen `{text,color}` aus einer DB-Spalte (Tabelle **ohne** `rex_`-Präfix) |
+| `collectTextsFromTable` | `collectTextsFromTable(string $table, string $field): array` | Nur Texte aller eindeutigen Tags |
+| `sqlHasTag` | `sqlHasTag(string $field, string $tagText): string` | SQL-`WHERE`-Snippet für JSON-Tag-Suche (MySQL ≥ 5.7) |
+| `filterByTag` | `filterByTag(array $rows, string $field, string $tagText): array` | PHP-Filter über Datensatz-Array |
+| `renderWidgetOpen` | `renderWidgetOpen(string $targetId, array $options = []): string` | Tagging-Widget-HTML für eigene `rex_form`-Integrationen |
+
+Konstante `FieldsTagging::DEFAULT_COLORS` enthält die Standard-Farbpalette (10 WCAG-kontraststarke Farben).
+
+### 3.2 `FriendsOfRedaxo\Fields\OpeningHoursHelper`
+
+Instanziierbarer Helper für strukturierte Öffnungszeiten.
+
+| Methode | Signatur | Zweck |
+|---|---|---|
+| `__construct` | `__construct(?string $json, string $locale = 'de')` | JSON-String und Sprache (`de`/`en`) übergeben |
+| `setTranslations` | `setTranslations(string $locale, array $translations): self` | Eigene Übersetzungen registrieren |
+| `setLocale` | `setLocale(string $locale): self` | Aktive Sprache wechseln |
+| `translate` | `translate(string $key, ?string $fallback = null): string` | Übersetzung per Punkt-Notation (z. B. `labels.we_are_open`) |
+| `hasData` | `hasData(): bool` | Gültige Daten vorhanden? |
+| `getNote` | `getNote(): ?string` | Hinweistext aus dem Editor |
+| `hasNote` | `hasNote(): bool` | Hinweistext vorhanden? |
+| `getRegular` | `getRegular(bool $shortLabels = false): array` | Alle Wochentage mit Label, Zeiten, `is_today`, `is_open`, … |
+| `getRegularGrouped` | `getRegularGrouped(): array` | Wochentage mit identischen Zeiten zusammenfassen (Mo–Fr-Gruppen) |
+| `getSpecial` | `getSpecial(?int $limit = null, bool $futureOnly = false): array` | Sondertage (sortiert, optional limitiert) |
+| `getToday` | `getToday(): ?array` | Heutiger Tag (Eintrag aus `getRegular`) |
+| `isOpenNow` | `isOpenNow(): bool` | Aktuell geöffnet? (berücksichtigt Sondertage) |
+| `getCurrentStatus` | `getCurrentStatus(): array` | `[is_open, label, today, next_change, next_change_label]` |
+| `getRawData` | `getRawData(): array` | Roh-Array aus dem JSON |
+
+### 3.3 `rex_yform_value_fields_faq`
+
+Klassisch-globale YForm-Wertklasse (kein Namespace).
+
+| Methode | Signatur | Zweck |
+|---|---|---|
+| `getSchemaJsonLd` | `getSchemaJsonLd(string $json): string` | Schema.org-`FAQPage`-JSON-LD `<script>`-Tag aus dem FAQ-JSON erzeugen |
+| `getListValue` | `getListValue(array $params): string` | YForm-Listenrenderer (intern verwendet) |
+
+### 3.4 `rex_yform_value_fields_iban`
+
+| Methode | Signatur | Zweck |
+|---|---|---|
+| `isValidFormat` | `isValidFormat(string $iban): bool` | IBAN-Format-Validierung (Länge, Mod-97-Prüfsumme) |
+| `getListValue` | `getListValue(array $params)` | YForm-Listenrenderer |
+
+### 3.5 `rex_yform_value_fields_social_web`
+
+| Methode | Signatur | Zweck |
+|---|---|---|
+| `getPlatforms` | `getPlatforms(): array` | Liste aller 24 vordefinierten Plattformen `[key => [name, icon, color]]` |
+| `getListValue` | `getListValue(array $params)` | YForm-Listenrenderer |
+
+```php
+foreach (rex_yform_value_fields_social_web::getPlatforms() as $key => $meta) {
+    echo $key . ': ' . $meta['name'] . ' ' . $meta['icon'] . '<br>';
+}
+```
+
+### 3.6 `rex_yform_value_fields_inline_select`
+
+Hilfsmethoden für das Choices-Parsing des Inline-Select-Felds.
+
+| Methode | Signatur | Zweck |
+|---|---|---|
+| `resolveChoices` | `resolveChoices(string $rawChoices, string $query): array` | Liefert Endgültige `[value => label]`-Map (statisch + Query-Quelle) |
+| `parseChoices` | `parseChoices(string $raw): array` | Parst die `key=value`-Syntax aus dem Feldwert |
+| `parseChoicesFromQuery` | `parseChoicesFromQuery(string $query): array` | Lädt Choices aus SQL-Query |
+| `parseColors` | `parseColors(string $raw): array` | Parst Farbzuordnungen `key=#hex` |
+| `parseLockValues` | `parseLockValues(string $raw): array` | Werte, die Inline-Editing sperren |
+| `isValueLocked` | `isValueLocked(string $value, string $lockRaw): bool` | Prüft Locked-Zustand |
+| `renderColorDot` | `renderColorDot(string $color): string` | HTML eines farbigen Punkts |
+| `renderOptionContent` | `renderOptionContent(string $label, string $color): string` | Option-HTML für Listen/Selectpicker |
+
+### 3.7 Weitere `getListValue`-Hooks
+
+Folgende Feldklassen stellen `public static function getListValue(array $params)` für die YForm-Listenanzeige bereit – nicht für den Frontend-Einsatz gedacht:
+
+`rex_yform_value_fields_opening_hours`, `rex_yform_value_fields_rating`, `rex_yform_value_fields_contacts`, `rex_yform_value_fields_tagging`, `rex_yform_value_fields_table`, `rex_yform_value_fields_inline`, `rex_yform_value_fields_inline_switch`, `rex_yform_value_fields_inline_number`.
+
+---
+
+## 4. REX-API-Endpunkte
+
+Alle Endpunkte sind klassische `rex_api_function`-Implementierungen und liefern JSON.
+
+### 4.1 IBAN-Validierung – `fields_iban_validate`
+
+- **Klasse:** `FriendsOfRedaxo\Fields\rex_api_fields_iban_validate`
+- **Frontend-tauglich:** ja (`$published = true`)
+- **Methode:** `GET`
+- **Parameter:** `iban` (string, Pflicht)
 
 ```
 GET index.php?rex-api-call=fields_iban_validate&iban=DE89370400440532013000
 ```
 
-Antwort:
+Erfolgreiche Antwort:
 
 ```json
 {
@@ -388,6 +611,114 @@ Antwort:
     "city": "Aachen"
 }
 ```
+
+Fallback wenn openIBAN.com nicht erreichbar ist (nur lokale Format-/Prüfsummen-Validierung):
+
+```json
+{ "valid": true, "local_only": true, "iban": "DE89370400440532013000",
+  "message": "Local validation only (API unavailable)" }
+```
+
+Fehler:
+
+```json
+{ "valid": false, "error": "Invalid IBAN format", "iban": "…" }
+```
+
+HTTP-Status `400` bei fehlender IBAN, `200` sonst.
+
+### 4.2 Inline-Update – `fields_inline_update`
+
+- **Klasse:** `FriendsOfRedaxo\Fields\rex_api_fields_inline_update`
+- **Backend-only:** `$published = false` – erfordert eingeloggten REDAXO-Benutzer
+- **Methode:** `POST`
+- **CSRF:** erforderlich (`rex_csrf_token::factory('fields_inline_edit')`)
+- **Permissions:** Admin **oder** `yform[<tabellenname inkl. Präfix>]`
+
+Parameter:
+
+| Name | Typ | Beschreibung |
+|---|---|---|
+| `table` | string | YForm-Tabellenname inkl. `rex_`-Präfix |
+| `field` | string | Feldname |
+| `id` | int | Datensatz-ID |
+| `value` | string | Neuer Wert |
+| `_csrf_token` | string | CSRF-Token aus `rex_csrf_token::factory('fields_inline_edit')->getValue()` |
+
+Erfolgsantwort:
+
+```json
+{ "success": true, "id": 42, "value": "neu", "formatted": "1.234,50" }
+```
+
+Bei Fehlern (CSRF, Permission, Lock, ungültiger Wert):
+
+```json
+{ "success": false, "message": "Permission denied for table rex_products" }
+```
+
+Hinweis: Für `fields_inline_select` werden Locked-Werte und nicht erlaubte Choices serverseitig geprüft.
+
+### 4.3 Tagging-Vorschläge – `fields_tagging_suggest`
+
+- **Klasse:** `FriendsOfRedaxo\Fields\rex_api_fields_tagging_suggest`
+- **Backend-only:** `$published = false`, prüft `rex::isBackend()` und Login
+
+Parameter:
+
+| Name | Typ | Beschreibung |
+|---|---|---|
+| `table` | string | Tabellenname (mit oder ohne `rex_`-Präfix) |
+| `field` | string | Spaltenname |
+
+Antwort:
+
+```json
+{
+    "success": true,
+    "tags": [
+        { "text": "php", "color": "#2980b9" },
+        { "text": "redaxo", "color": "#27ae60" }
+    ]
+}
+```
+
+Liefert max. 500 Quellzeilen, parst sowohl das aktuelle JSON-Format als auch Legacy-Kommalisten und liefert pro Tag-Text die zuletzt verwendete Farbe.
+
+---
+
+## 5. Layout-/Logik-Felder (Backend-Konfiguration)
+
+Diese Felder erzeugen keine Datenbankspalten. Sie strukturieren ausschließlich die Backend-Formulare des YForm-Managers und werden in der Feldkonfiguration parametrisiert.
+
+### 5.1 Conditional – `fields_conditional`
+
+| Option | Beschreibung |
+|---|---|
+| Quellfeld | Feld, dessen Wert geprüft wird |
+| Operator | `==`, `!=`, `>`, `<`, `contains`, `empty`, `!empty`, `switch` |
+| Vergleichswert | Erwarteter Wert (bei `switch` irrelevant) |
+| Zielfelder | Feldnamen oder CSS-Selektoren, kommasepariert |
+| Aktion | `show` oder `hide` |
+
+### 5.2 Tabs / Akkordeons – `fields_interactive`
+
+1. `fields_interactive` (Typ: **Tab Start**, Label „Basisdaten“, Gruppen-ID `1`)
+2. … Felder für Tab 1 …
+3. `fields_interactive` (Typ: **Tab Start**, Label „Erweitert“, Gruppen-ID `1`)
+4. … Felder für Tab 2 …
+5. `fields_interactive` (Typ: **Gruppe Ende**, Gruppen-ID `1`)
+
+Statt `Tab Start` ist auch **Akkordeon Start** oder **Fieldset Start** möglich.
+
+### 5.3 Grid / Layout – `fields_structure`
+
+- **Start**: beginnt einen CSS-Grid-Container
+- **Layout**: Spalten via Grid-Template (`1fr 1fr`, `1fr 2fr`, …)
+- **Gap**: Abstand zwischen Spalten
+- **Ende**: schließt den Grid-Container
+
+Alle Felder zwischen Start und Ende werden ins Grid aufgenommen.
 
 ---
 
