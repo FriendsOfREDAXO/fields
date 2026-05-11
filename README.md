@@ -359,9 +359,125 @@ echo number_format((float) $item->getValue('preis'), 2);    // Zahl
 
 ---
 
+## 1.11 Wie Fragmente funktionieren – am Beispiel `rating.php`
+
+Alle Fragmente folgen demselben Muster: Sie sind eigenständige PHP-Templates, die per `rex_fragment` aufgerufen werden. REDAXO sucht das Template in allen registrierten Fragment-Verzeichnissen – das Addon registriert dafür den eigenen Ordner in `boot.php`:
+
+```php
+rex_fragment::addDirectory(rex_addon::get('fields')->getPath('fragments'));
+```
+
+### Datenfluss
+
+```
+$item->getValue('rating')   ──►  rex_fragment::setVar(...)   ──►  fragments/fields/<fw>/rating.php
+        (int aus DB)              (Variable für das Template)        (rendert HTML)
+```
+
+### Datenformat des Rating-Felds
+
+Das Feld `fields_rating` speichert einen **einfachen Integer** in der DB (Spaltentyp `int`, Wertebereich 1–10). Es gibt kein JSON, kein Subschema – nur einen Skalarwert:
+
+```sql
+SELECT rating FROM rex_my_table;  -- z. B. 4
+```
+
+### Das mitgelieferte Bootstrap-3-Fragment
+
+`fragments/fields/bootstrap3/rating.php`:
+
+```php
+<?php
+/**
+ * Star Rating Fragment (Bootstrap 3)
+ * @var rex_fragment $this
+ */
+$max       = (int) $this->getVar('max', 5);
+$value     = (int) $this->getVar('value', 0);
+$class     = $this->getVar('class', '');
+$iconFull  = $this->getVar('icon_full', 'fa fa-star');
+$iconEmpty = $this->getVar('icon_empty', 'fa fa-star-o');
+$color     = $this->getVar('color', '#ffc107');
+?>
+<div class="fields-rating <?= $class ?>" aria-label="<?= $value ?> von <?= $max ?> Sternen" role="img">
+    <?php for ($i = 1; $i <= $max; $i++): ?>
+        <?php if ($i <= $value): ?>
+            <i class="<?= $iconFull ?>" style="color: <?= $color ?>;" aria-hidden="true"></i>
+        <?php else: ?>
+            <i class="<?= $iconEmpty ?>" style="color: #ccc;" aria-hidden="true"></i>
+        <?php endif; ?>
+    <?php endfor; ?>
+    <span class="sr-only"><?= $value ?>/<?= $max ?></span>
+</div>
+```
+
+**Wichtige Regeln, die jedes Fragment einhalten sollte:**
+
+1. **Variablen mit Defaults** via `$this->getVar('name', $default)` lesen – nie ohne Default, sonst bricht das Template bei fehlenden Vars.
+2. **Typen casten** (`(int)`, `(string)`, `(bool)`), denn `setVar` macht keine Typprüfung.
+3. **Output escapen** mit `rex_escape(...)` für alle dynamischen Werte, die aus Nutzerdaten stammen (CSS-Klassen, Labels, Texte). Reine konstante Strings wie `fa fa-star` müssen nicht escapt werden, dynamische Eingaben schon.
+4. **Barrierefreiheit**: `aria-label`, `role`, `sr-only`-Text – wie im Beispiel.
+5. **Kein PHP-State leaken**: alle Variablen werden lokal im Template definiert, nicht global.
+
+### Eigenes Fragment für ein anderes Framework schreiben (Bulma als Beispiel)
+
+Das Fields-Addon liefert nur `bootstrap3`, `uikit3`, `tailwind` und `plain`. Wer **Bulma**, **Foundation** oder ein hauseigenes Designsystem verwendet, legt ein eigenes Fragment-Verzeichnis im Projekt-Addon (oder Project-Addon) an. REDAXO durchsucht alle registrierten Verzeichnisse in der Reihenfolge ihrer Registrierung – das erste passende Template gewinnt, eigene Templates können also auch die mitgelieferten überschreiben.
+
+**Schritt 1 – Verzeichnis registrieren** (z. B. in der `boot.php` des Project-Addons):
+
+```php
+rex_fragment::addDirectory(
+    rex_path::addon('project', 'fragments/'),
+);
+```
+
+**Schritt 2 – Datei anlegen** unter `redaxo/src/addons/project/fragments/fields/bulma/rating.php`:
+
+```php
+<?php
+/**
+ * Star Rating Fragment (Bulma)
+ * @var rex_fragment $this
+ */
+$max       = (int) $this->getVar('max', 5);
+$value     = (int) $this->getVar('value', 0);
+$class     = rex_escape((string) $this->getVar('class', ''));
+$colorFull = rex_escape((string) $this->getVar('color', 'has-text-warning'));
+$colorEmpty = rex_escape((string) $this->getVar('color_empty', 'has-text-grey-light'));
+?>
+<div class="fields-rating <?= $class ?> is-inline-flex"
+     role="img"
+     aria-label="<?= rex_escape($value . ' von ' . $max . ' Sternen') ?>">
+    <?php for ($i = 1; $i <= $max; $i++): ?>
+        <span class="icon <?= $i <= $value ? $colorFull : $colorEmpty ?>">
+            <i class="fas <?= $i <= $value ? 'fa-star' : 'fa-star' ?>"></i>
+        </span>
+    <?php endfor; ?>
+    <span class="is-sr-only"><?= (int) $value ?>/<?= (int) $max ?></span>
+</div>
+```
+
+**Schritt 3 – Im Modul/Template nutzen:**
+
+```php
+$fragment = new rex_fragment();
+$fragment->setVar('value', (int) $item->getValue('rating'));
+$fragment->setVar('max', 5);
+$fragment->setVar('color', 'has-text-warning');
+$fragment->setVar('color_empty', 'has-text-grey-light');
+echo $fragment->parse('fields/bulma/rating.php');
+```
+
+> **Tipp:** Möchte man die mitgelieferten Fragmente nur **anpassen** (statt eines neuen Frameworks), genügt es, eine Datei mit identischem Pfad im eigenen Addon anzulegen, z. B. `project/fragments/fields/bootstrap3/rating.php`. Da das eigene Verzeichnis i. d. R. zuletzt registriert wird, hat es Vorrang vor dem Original aus dem `fields`-Addon.
+
+Dieses Schema funktioniert für **alle** Fragmente des Addons – `social_web.php`, `opening_hours.php`, `faq.php`, `contacts.php`, `table.php`, `qrcode.php`. Die Eingabe-Variablen sind in Abschnitt 1.1–1.7 dokumentiert.
+
+---
+
 ## 2. Verarbeitungsbeispiele
 
 Praxisrezepte für typische Modul-/Template-Aufgaben.
+
 
 ### 2.1 Eine Liste filtern (Tagging)
 
