@@ -25,18 +25,21 @@ Anschließend stehen alle Feldtypen automatisch in der YForm-Feldauswahl zur Ver
 
 ## Features
 
-### Spezielle Eingabetypen (UI Controls)
+Die Feldtypen lassen sich in zwei Kategorien einteilen:
 
-- **Inline Switch** – Moderner, eckiger Toggle-Switch für Boolean-Werte (Liste & Formular)
-- **Inline Edit** – Direktes Bearbeiten von Text- und Textarea-Feldern in der Listenansicht (Click-to-Edit)
-- **Inline Number** – Zahlenfeld mit Inline-Editing, Präfix/Suffix (z. B. €/km), Min/Max und Step
-- **Inline Select** – Auswahlfeld mit Inline-Editing, Selectpicker, Farben und optionaler Query-Quelle
+- **Felder mit Frontend-Ausgabe** speichern strukturierte Daten und werden über die mitgelieferten Fragmente (Bootstrap 3, UIkit 3, Tailwind, Plain) im Frontend gerendert.
+- **Backend-/Helper-Felder** haben keine eigene Frontend-Ausgabe – sie verbessern die redaktionelle Arbeit (Inline-Editing in Listen) oder steuern Layout und Sichtbarkeit von Formularfeldern im Backend.
+
+### Felder mit Frontend-Ausgabe
+
+#### UI Controls
+
 - **Icon Picker** – Icon-Auswahl aus Font Awesome und/oder UIkit-Iconsets
 - **Star Rating** – Bewertungsfeld (1–10 Sterne) mit visueller Eingabe
 - **IBAN** – IBAN-Eingabe mit Live-Validierung über openIBAN.com (serverseitig geproxied)
 - **Tagging** – Farbige Schlagwörter (Chips) mit Custom-Color-Picker und WCAG-Kontrastprüfung
 
-### Komplexe Datentypen (Repeater & Strukturen)
+#### Komplexe Datentypen (Repeater & Strukturen)
 
 - **Tabelle** – Barrierefreier Tabelleneditor mit flexiblen Spalten/Zeilen, Min/Max-Constraints und erweiterten Datentypen (Medien, Links, Textarea, Zahlen)
 - **Social Web** – Repeater für Social-Media-Profile mit 24 vordefinierten Plattformen
@@ -44,11 +47,24 @@ Anschließend stehen alle Feldtypen automatisch in der YForm-Feldauswahl zur Ver
 - **Kontakte** – Flexible Kontaktkarten mit konfigurierbaren optionalen Feldern (Avatar, Firma, Adresse, …)
 - **FAQ** – Frage/Antwort-Repeater mit automatischer Schema.org-FAQPage-JSON-LD-Ausgabe
 
-### Layout & Logik
+### Backend-/Helper-Felder (keine Frontend-Ausgabe)
 
-- **Tabs & Akkordeons** – Gruppierung von Feldern in Tabs, Akkordeons oder Fieldsets
-- **Grid & Layout** – Mehrspaltige Anordnung von Feldern (CSS Grid)
-- **Conditional** – Bedingte Sichtbarkeit von Feldgruppen abhängig von anderen Feldwerten
+#### Inline-Editing in der Listenansicht
+
+Diese Felder speichern jeweils einen einfachen Wert (Text, Zahl, Auswahl, Boolean), bringen aber im Backend zusätzlichen Komfort durch Click-to-Edit direkt in der YForm-Tabellenübersicht. Im Frontend werden sie wie ein normales Datenfeld behandelt (`$item->getValue(...)`) – es gibt keine speziellen Fragmente.
+
+- **Inline Switch** – Moderner, eckiger Toggle-Switch für Boolean-Werte
+- **Inline Edit** – Direktes Bearbeiten von Text- und Textarea-Feldern (Click-to-Edit)
+- **Inline Number** – Zahlenfeld mit Inline-Editing, Präfix/Suffix (z. B. €/km), Min/Max und Step
+- **Inline Select** – Auswahlfeld mit Inline-Editing, Selectpicker, Farben und optionaler Query-Quelle
+
+#### Layout & Logik (nur Backend-Formular)
+
+Diese Feldtypen erzeugen **keine eigenen DB-Spalten** und schreiben keine Werte – sie strukturieren ausschließlich das YForm-Formular im Backend.
+
+- **Tabs & Akkordeons** (`fields_interactive`) – Gruppierung von Feldern in Tabs, Akkordeons oder Fieldsets
+- **Grid & Layout** (`fields_structure`) – Mehrspaltige Anordnung von Feldern (CSS Grid)
+- **Conditional** (`fields_conditional`) – Bedingte Sichtbarkeit von Feldgruppen abhängig von anderen Feldwerten
 
 ### Konfiguration
 
@@ -63,7 +79,9 @@ Unter **YForm → Fields**:
 
 ## Anwendung im YForm-Tablemanager
 
-Die Feldtypen erscheinen nach der Installation automatisch in der YForm-Feldauswahl unter dem Typ **value**:
+Die Feldtypen erscheinen nach der Installation automatisch in der YForm-Feldauswahl unter dem Typ **value**.
+
+#### Felder mit Frontend-Ausgabe
 
 | Feldtyp | DB-Typ | Beschreibung |
 |---|---|---|
@@ -73,16 +91,23 @@ Die Feldtypen erscheinen nach der Installation automatisch in der YForm-Feldausw
 | `fields_table` | `mediumtext` | Tabelle mit Spalten- und Zeilendaten sowie Meta-Infos |
 | `fields_iban` | `varchar(34)` | IBAN mit Validierung |
 | `fields_faq` | `mediumtext` | FAQ-Einträge als JSON |
-| `fields_conditional` | *kein DB-Feld* | Steuert Sichtbarkeit anderer Felder |
-| `fields_interactive` | *kein DB-Feld* | Felder in Tabs/Akkordeons gruppieren |
-| `fields_structure` | *kein DB-Feld* | Felder mehrspaltig anordnen (Grid) |
 | `fields_icon_picker` | `varchar(191)` | Ausgewähltes Icon (z. B. `fa-home`) |
 | `fields_rating` | `int` | Ganzzahlige Bewertung |
-| `fields_inline_switch` | `tinyint(1)` | Boolescher Switch für Liste & Formular |
-| `fields_inline` | `text`, `mediumtext` | Text/Textarea mit Inline-Editing |
-| `fields_inline_number` | `int`, `float`, `decimal` | Zahlenfeld mit Inline-Editing |
-| `fields_inline_select` | `varchar(191)`, `text` | Auswahlfeld mit Inline-Editing |
 | `fields_tagging` | `text` | Farbige Tag-Chips als JSON |
+
+#### Backend-/Helper-Felder ohne eigene Frontend-Ausgabe
+
+| Feldtyp | DB-Typ | Beschreibung |
+|---|---|---|
+| `fields_inline_switch` | `tinyint(1)` | Boolescher Switch mit Inline-Editing in der Liste |
+| `fields_inline` | `text`, `mediumtext` | Text/Textarea mit Inline-Editing in der Liste |
+| `fields_inline_number` | `int`, `float`, `decimal` | Zahlenfeld mit Inline-Editing in der Liste |
+| `fields_inline_select` | `varchar(191)`, `text` | Auswahlfeld mit Inline-Editing in der Liste |
+| `fields_conditional` | *kein DB-Feld* | Steuert Sichtbarkeit anderer Backend-Felder |
+| `fields_interactive` | *kein DB-Feld* | Felder im Backend in Tabs/Akkordeons gruppieren |
+| `fields_structure` | *kein DB-Feld* | Felder im Backend mehrspaltig anordnen (Grid) |
+
+> Die Inline-Felder speichern reguläre Werte und können im Frontend einfach über `$item->getValue(...)` ausgelesen werden. `fields_conditional`, `fields_interactive` und `fields_structure` erzeugen **keine DB-Spalten** – sie strukturieren nur das Backend-Formular.
 
 ### Inline Editing in der Listenansicht
 
