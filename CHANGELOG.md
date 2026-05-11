@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.2 - 2026-05-12
+
+### Added
+
+- **Inline-Tagging in der Listenansicht** (`fields_tagging`): Neue optionale Felddefinition `list_editable`. Wenn aktiviert, koennen Tags direkt in der YForm-Tabellenuebersicht hinzugefuegt und entfernt werden – inkl. Popover mit Vorschlaegen aus der Quelltabelle, Farbpicker und Speicherung via `rex-api-call=fields_inline_update`.
+
 ## 1.3.1 - 2026-05-11
 
 ### Changed

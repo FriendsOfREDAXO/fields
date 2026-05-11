@@ -15,7 +15,7 @@ use rex_response;
  */
 class rex_api_fields_inline_update extends rex_api_function
 {
-    protected $published = true; // Publicly accessible via index.php?rex-api-call=...
+    protected $published = false; // Backend-only: requires logged-in REDAXO user
 
     public function execute()
     {

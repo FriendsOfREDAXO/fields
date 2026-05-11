@@ -16,7 +16,7 @@ use rex_sql;
  */
 class rex_api_fields_tagging_suggest extends rex_api_function
 {
-    protected $published = true;
+    protected $published = false; // Backend-only: requires logged-in REDAXO user
 
     public function execute(): void
     {

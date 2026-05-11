@@ -127,6 +127,10 @@ Das Feld `fields_tagging` bringt eine eigene Suchintegration für den Tablemanag
 - Zusatzauswahl für **(empty)** und **Nicht leer**
 - Robuste Filterung für `NULL`, leere Strings und `[]`
 
+### Tagging: Inline-Editing in der Listenansicht
+
+Mit der Feldoption **„Tags in der Listenansicht bearbeitbar“** (`list_editable = 1`) lassen sich Tags direkt in der YForm-Tabellenübersicht über einen **+**-Button (Popover mit Texteingabe, Farbpicker, Vorschlägen) hinzufügen und per `×` entfernen. `max_tags` wird respektiert. Standard: aus.
+
 ---
 
 ## Anwendung im Metainfo-AddOn
@@ -152,6 +156,7 @@ Aktuell stellt **Fields** für das Metainfo-AddOn genau einen Feldtyp bereit: **
 | `source_table` | Tabelle für Autocomplete-Vorschläge (mit oder ohne `rex_`-Präfix) |
 | `source_field` | Spaltenname der Quelle |
 | `max_tags` | Maximale Tag-Anzahl (0 = unbegrenzt) |
+| `list_editable` | `1` aktiviert Inline-Editing direkt in der YForm-Listenansicht (Tags ohne Detailformular hinzufügen/entfernen) |
 | `notice` | Hinweistext unter dem Feld |
 
 > **Automatische Quelle:** Bleibt `source_table`/`source_field` leer, leitet das Widget die Quelle aus dem Feldnamen ab: `art_*` → `rex_article`, `med_*` → `rex_media`, `clang_*` → `rex_clang`. Ist gar keine Quelle gepflegt, bleibt das Feld trotzdem speicherbar – nur die Vorschlagsliste ist leer.

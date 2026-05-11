@@ -52,7 +52,7 @@ class rex_yform_value_fields_tagging extends rex_yform_value_abstract
 
     public function getDescription(): string
     {
-        return 'fields_tagging|name|label|source_table|source_field|max_tags|notice';
+        return 'fields_tagging|name|label|source_table|source_field|max_tags|list_editable|notice';
     }
 
     /**
@@ -64,12 +64,13 @@ class rex_yform_value_fields_tagging extends rex_yform_value_abstract
             'type'  => 'value',
             'name'  => 'fields_tagging',
             'values' => [
-                'name'         => ['type' => 'name', 'label' => rex_i18n::msg('yform_values_defaults_name')],
-                'label'        => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_defaults_label')],
-                'source_table' => ['type' => 'text', 'label' => rex_i18n::msg('fields_tagging_source_table')],
+                'name'          => ['type' => 'name', 'label' => rex_i18n::msg('yform_values_defaults_name')],
+                'label'         => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_defaults_label')],
+                'source_table'  => ['type' => 'text', 'label' => rex_i18n::msg('fields_tagging_source_table')],
                 'source_field' => ['type' => 'text', 'label' => rex_i18n::msg('fields_tagging_source_field')],
-                'max_tags'     => ['type' => 'text', 'label' => rex_i18n::msg('fields_tagging_max_tags')],
-                'notice'       => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_defaults_notice')],
+                'max_tags'      => ['type' => 'text', 'label' => rex_i18n::msg('fields_tagging_max_tags')],
+                'list_editable' => ['type' => 'choice', 'label' => rex_i18n::msg('fields_tagging_list_editable'), 'choices' => '0,1', 'default' => '0', 'notice' => rex_i18n::msg('fields_tagging_list_editable_notice')],
+                'notice'        => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_defaults_notice')],
             ],
             'description' => rex_i18n::msg('fields_tagging_description'),
             'db_type'     => ['text'],
@@ -80,29 +81,97 @@ class rex_yform_value_fields_tagging extends rex_yform_value_abstract
     public static function getListValue(array $params): string
     {
         $raw = trim((string) ($params['value'] ?? ''));
-        if ($raw === '') {
-            return '-';
-        }
+        $field = $params['params']['field'] ?? [];
+        $listEditable = !empty($field['list_editable']) && (string) $field['list_editable'] === '1';
 
-        $decoded = json_decode($raw, true);
-        if (!is_array($decoded) || $decoded === []) {
-            return '-';
-        }
-
-        $output = [];
-        foreach ($decoded as $item) {
-            if (!is_array($item) || !isset($item['text'])) {
-                continue;
+        $tags = [];
+        if ('' !== $raw) {
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded)) {
+                foreach ($decoded as $item) {
+                    if (is_array($item) && isset($item['text'])) {
+                        $tags[] = [
+                            'text'  => (string) $item['text'],
+                            'color' => isset($item['color']) ? (string) $item['color'] : '#7f8c8d',
+                        ];
+                    }
+                }
             }
-            $color = isset($item['color']) ? rex_escape($item['color']) : '#7f8c8d';
-            $output[] = sprintf(
-                '<span style="display:inline-block;background:%s;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;margin:1px 2px;">%s</span>',
-                $color,
-                rex_escape((string) $item['text']),
+        }
+
+        if (!$listEditable) {
+            if ([] === $tags) {
+                return '-';
+            }
+
+            $output = '';
+            foreach ($tags as $item) {
+                $output .= sprintf(
+                    '<span style="display:inline-block;background:%s;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;margin:1px 2px;">%s</span>',
+                    rex_escape($item['color']),
+                    rex_escape($item['text']),
+                );
+            }
+
+            return $output;
+        }
+
+        // Inline-Edit-Modus
+        $list = $params['list'];
+        $id = (int) $list->getValue('id');
+        $listParams = $list->getParams();
+        $table = (string) ($listParams['table_name'] ?? rex_request('table_name', 'string'));
+        $fieldName = (string) ($field['name'] ?? '');
+
+        $sourceTable = trim((string) ($field['source_table'] ?? ''));
+        $sourceField = trim((string) ($field['source_field'] ?? ''));
+        if ('' === $sourceField) {
+            $sourceField = $fieldName;
+        }
+        if ('' === $sourceTable) {
+            $sourceTable = $table;
+        }
+        $prefix = rex::getTablePrefix();
+        if ('' !== $sourceTable && str_starts_with($sourceTable, $prefix)) {
+            $sourceTable = substr($sourceTable, strlen($prefix));
+        }
+
+        $maxTags = max(0, (int) ($field['max_tags'] ?? 0));
+        $token = rex_csrf_token::factory('fields_inline_edit')->getValue();
+        $suggestUrl = rex_url::backendController(['rex-api-call' => 'fields_tagging_suggest']);
+
+        $chips = '';
+        foreach ($tags as $tag) {
+            $chips .= sprintf(
+                '<span class="fields-tagging-inline-chip" data-text="%s" data-color="%s" style="background:%s" title="%s"><span class="fields-tagging-inline-chip-text">%s</span><button type="button" class="fields-tagging-inline-remove" aria-label="%s">&times;</button></span>',
+                rex_escape($tag['text']),
+                rex_escape($tag['color']),
+                rex_escape($tag['color']),
+                rex_escape($tag['text']),
+                rex_escape($tag['text']),
+                rex_escape(rex_i18n::msg('delete')),
             );
         }
 
-        return $output !== [] ? implode('', $output) : '-';
+        $defaultColor = FieldsTagging::DEFAULT_COLORS[0] ?? '#7f8c8d';
+
+        return sprintf(
+            '<div class="fields-tagging-inline" data-table="%s" data-field="%s" data-id="%d" data-token="%s" data-api-suggest="%s" data-source-table="%s" data-source-field="%s" data-max-tags="%d" data-default-color="%s">'
+            . '<div class="fields-tagging-inline-chips">%s</div>'
+            . '<button type="button" class="fields-tagging-inline-add" title="%s"><i class="rex-icon fa-plus"></i></button>'
+            . '</div>',
+            rex_escape($table),
+            rex_escape($fieldName),
+            $id,
+            rex_escape($token),
+            rex_escape($suggestUrl),
+            rex_escape($sourceTable),
+            rex_escape($sourceField),
+            $maxTags,
+            rex_escape($defaultColor),
+            $chips,
+            rex_escape(rex_i18n::msg('add')),
+        );
     }
 
     public static function getSearchField($params): void

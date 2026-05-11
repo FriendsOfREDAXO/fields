@@ -232,3 +232,188 @@ body.rex-theme-dark .fields-tagging-widget {
     padding-top: 8px;
     border-top: 1px solid var(--ft-panel-footer-border);
 }
+
+/* ─── Inline-Tagging in der Listenansicht ─────────────────────────── */
+
+/* 1) Light defaults (component scope) */
+.fields-tagging-inline,
+.fields-tagging-inline-popover {
+    --fti-add-bg: transparent;
+    --fti-add-border: #b6b6b6;
+    --fti-add-color: #888;
+    --fti-add-hover-bg: #f5f5f5;
+    --fti-add-hover-color: #444;
+    --fti-saved-color: #2ecc71;
+    --fti-popover-bg: #ffffff;
+    --fti-popover-border: #ccc;
+    --fti-popover-color: #2c3e50;
+    --fti-popover-shadow: rgba(0, 0, 0, 0.15);
+    --fti-input-bg: #ffffff;
+    --fti-input-border: #ccc;
+    --fti-input-color: #2c3e50;
+    --fti-muted-color: #888;
+}
+
+/* 2) Dark mode: Explicit */
+body.rex-theme-dark .fields-tagging-inline,
+body.rex-theme-dark .fields-tagging-inline-popover {
+    --fti-add-bg: transparent;
+    --fti-add-border: #555;
+    --fti-add-color: #aaa;
+    --fti-add-hover-bg: #3a3f47;
+    --fti-add-hover-color: #eee;
+    --fti-saved-color: #2ecc71;
+    --fti-popover-bg: #2a2d35;
+    --fti-popover-border: #444;
+    --fti-popover-color: #e8f0f7;
+    --fti-popover-shadow: rgba(0, 0, 0, 0.5);
+    --fti-input-bg: #1f2229;
+    --fti-input-border: #555;
+    --fti-input-color: #e8f0f7;
+    --fti-muted-color: #999;
+}
+
+/* 3) Dark mode: Auto (must mirror explicit dark values) */
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .fields-tagging-inline,
+    body.rex-has-theme:not(.rex-theme-light) .fields-tagging-inline-popover {
+        --fti-add-bg: transparent;
+        --fti-add-border: #555;
+        --fti-add-color: #aaa;
+        --fti-add-hover-bg: #3a3f47;
+        --fti-add-hover-color: #eee;
+        --fti-saved-color: #2ecc71;
+        --fti-popover-bg: #2a2d35;
+        --fti-popover-border: #444;
+        --fti-popover-color: #e8f0f7;
+        --fti-popover-shadow: rgba(0, 0, 0, 0.5);
+        --fti-input-bg: #1f2229;
+        --fti-input-border: #555;
+        --fti-input-color: #e8f0f7;
+        --fti-muted-color: #999;
+    }
+}
+
+.fields-tagging-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    max-width: 320px;
+    min-width: 0;
+}
+.fields-tagging-inline-chips {
+    display: contents;
+}
+.fields-tagging-inline-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 4px 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    color: #fff;
+    line-height: 1.2;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.fields-tagging-inline-chip-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 110px;
+}
+.fields-tagging-inline-remove {
+    background: rgba(0, 0, 0, 0.2);
+    border: 0;
+    color: inherit;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    line-height: 14px;
+    padding: 0;
+    font-size: 12px;
+    cursor: pointer;
+}
+.fields-tagging-inline-remove:hover {
+    background: rgba(0, 0, 0, 0.45);
+}
+.fields-tagging-inline-add {
+    background: var(--fti-add-bg);
+    border: 1px dashed var(--fti-add-border);
+    color: var(--fti-add-color);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    line-height: 18px;
+    padding: 0;
+    font-size: 11px;
+    cursor: pointer;
+}
+.fields-tagging-inline-add:hover {
+    background: var(--fti-add-hover-bg);
+    color: var(--fti-add-hover-color);
+}
+.fields-tagging-inline.is-saved .fields-tagging-inline-add {
+    border-color: var(--fti-saved-color);
+    color: var(--fti-saved-color);
+}
+
+.fields-tagging-inline-popover {
+    position: absolute;
+    z-index: 1080;
+    background: var(--fti-popover-bg);
+    border: 1px solid var(--fti-popover-border);
+    color: var(--fti-popover-color);
+    border-radius: 4px;
+    box-shadow: 0 4px 12px var(--fti-popover-shadow);
+    padding: 8px;
+    width: 280px;
+}
+.fields-tagging-inline-input-row {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 6px;
+}
+.fields-tagging-inline-text {
+    flex: 1;
+    background: var(--fti-input-bg);
+    border: 1px solid var(--fti-input-border);
+    color: var(--fti-input-color);
+}
+.fields-tagging-inline-text:focus {
+    background: var(--fti-input-bg);
+    color: var(--fti-input-color);
+}
+.fields-tagging-inline-color {
+    width: 32px;
+    padding: 0;
+    border: 1px solid var(--fti-input-border);
+    background: var(--fti-input-bg);
+    border-radius: 3px;
+    cursor: pointer;
+}
+.fields-tagging-inline-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-height: 180px;
+    overflow-y: auto;
+}
+.fields-tagging-inline-suggestions .text-muted,
+.fields-tagging-inline-suggestions em {
+    color: var(--fti-muted-color);
+}
+.fields-tagging-inline-suggest {
+    border: 0;
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-size: 11px;
+    cursor: pointer;
+}
+.fields-tagging-inline-suggest:hover {
+    opacity: 0.85;
+}
+

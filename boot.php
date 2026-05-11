@@ -37,6 +37,7 @@ if (rex::isBackend() && rex::getUser()) {
     rex_view::addJsFile($addon->getAssetsUrl('js/fields-interactive.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/fields-structure.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/fields-tagging.js'));
+    rex_view::addJsFile($addon->getAssetsUrl('js/fields-tagging-inline.js'));
 
     rex_view::addCssFile($addon->getAssetsUrl('css/fields-backend.css'));
     rex_view::addCssFile($addon->getAssetsUrl('css/fields-tagging.css'));
