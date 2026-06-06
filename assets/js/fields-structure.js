@@ -77,6 +77,13 @@
                  var dom = container instanceof jQuery ? container[0] : container;
                  initFieldsStructures(dom);
             });
+
+            // Some backend updates dispatch rex:change instead of rex:ready.
+            // Re-run structure wrapping so inline layouts stay consistent.
+            jQuery(document).on('rex:change', function(e, container) {
+                var dom = container instanceof jQuery ? container[0] : container;
+                initFieldsStructures(dom);
+            });
         }
     };
 
