@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.1 - 2026-06-07
+
+### Fixed
+
+- `fields_structure`: Re-Initialisierung zusätzlich bei `rex:change`, damit Inline-Feldlayouts auch nach dynamischen Backend-Updates zuverlässig erhalten bleiben.
+
 ## 1.4.0 - 2026-05-11
 
 ### Added
