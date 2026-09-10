@@ -5,17 +5,22 @@
  * @psalm-scope-this rex_yform_value_fields_table
  */
 
+// Constraints / Policies (vor dem Default-Block lesen, damit der leere Zustand sie respektiert)
+$minCols = (int)($this->getElement('min_cols') ?: 1);
+$maxCols = (int)($this->getElement('max_cols') ?: 999);
+$minRows = (int)($this->getElement('min_rows') ?: 1);
+$maxRows = (int)($this->getElement('max_rows') ?: 999);
+
 $value = $this->getValue();
 if (!is_string($value) || $value === '') {
+    $defaultCols = max(1, min($minCols, $maxCols));
+    $defaultRows = max(1, min($minRows, $maxRows));
     $data = [
         'caption' => '',
         'has_header_row' => true,
         'has_header_col' => false,
-        'cols' => [], // { type: 'text'|'number' }
-        'rows' => [
-            ['Spalte 1', 'Spalte 2', 'Spalte 3'],
-            ['', '', '']
-        ]
+        'cols' => array_fill(0, $defaultCols, ['type' => 'text']), // { type: 'text'|'number' }
+        'rows' => array_fill(0, $defaultRows, array_fill(0, $defaultCols, '')),
     ];
 } else {
     $data = json_decode($value, true);
@@ -29,11 +34,6 @@ $id = $this->getFieldId();
 $name = $this->getFieldName();
 $notice = $this->getElement('notice');
 
-// Constraints / Policies
-$minCols = (int)($this->getElement('min_cols') ?: 1);
-$maxCols = (int)($this->getElement('max_cols') ?: 999);
-$minRows = (int)($this->getElement('min_rows') ?: 1);
-$maxRows = (int)($this->getElement('max_rows') ?: 999);
 $headerRowPolicy = $this->getElement('header_row_policy') ?: 'user'; // user, yes, no
 $headerColPolicy = $this->getElement('header_col_policy') ?: 'user'; // user, yes, no
 $enableMedia = (bool)$this->getElement('enable_media');

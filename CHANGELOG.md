@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.2 - 2026-09-10
+
+### Fixed
+
+- `fields_table`: Der leere Ausgangszustand rendert nicht mehr hartkodiert 3 Spalten mit den Platzhaltertexten „Spalte 1/2/3“, sondern leitet Spalten-/Zeilenanzahl aus `min_cols`/`max_cols`/`min_rows`/`max_rows` ab. Verhindert, dass die Platzhaltertexte in Kombination mit `header_row_policy = no` ungewollt als echte Datenzeile gespeichert werden. ([#1](https://github.com/FriendsOfREDAXO/fields/issues/1))
+
 ## 1.4.1 - 2026-06-07
 
 ### Fixed
