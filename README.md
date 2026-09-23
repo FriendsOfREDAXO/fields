@@ -879,14 +879,16 @@ Alle Felder zwischen Start und Ende werden ins Grid aufgenommen.
         "monday": {
             "status": "open",
             "times": [
-                {"from": "08:00", "to": "12:00"},
-                {"from": "13:00", "to": "17:00"}
+                {"open": "08:00", "close": "12:00"},
+                {"open": "13:00", "close": "17:00"}
             ]
         },
         "saturday": { "status": "closed", "times": [] }
     },
     "special": [
-        { "date": "2024-12-24", "status": "closed", "label": "Heiligabend" }
+        { "date": "2024-12-24", "name": "Heiligabend", "status": "closed", "times": [] },
+        { "date": "12-31", "name": "Silvester", "status": "open", "times": [{"open": "10:00", "close": "14:00"}] },
+        { "date": "easter+1", "name": "Ostermontag", "status": "closed", "times": [] }
     ],
     "note": "Termine nur nach Vereinbarung"
 }
