@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- `fields_opening_hours`: Sonderöffnungszeiten mit Status „Geöffnet“ haben jetzt Zeitfelder (inkl. „Zeitslot hinzufügen“/Entfernen) und die Zeiten werden gespeichert. Bisher blieb der Zeitenbereich leer und das JavaScript schrieb für Sondertage fest `times: []`, ein geöffneter Sondertag kam also immer ohne Zeiten an. Bereits gespeicherte Zeiten werden wieder bearbeitbar dargestellt.
+- README: Beispiel-JSON der Öffnungszeiten an das tatsächliche Format angepasst (`open`/`close` statt `from`/`to`, `name` statt `label`) und um die Datumsformate `MM-DD` und `easter±N` ergänzt.
+
 ## 1.4.2 - 2026-09-10
 
 ### Fixed

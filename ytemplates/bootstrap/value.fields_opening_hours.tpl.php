@@ -123,14 +123,23 @@ $fieldId = $this->getFieldId();
                                         <option value="open" <?= ($special['status'] ?? '') === 'open' ? 'selected' : '' ?>><?= rex_i18n::msg('fields_opening_hours_status_open') ?></option>
                                     </select>
                                 </div>
+                                <?php $specialTimes = $special['times'] ?? []; ?>
                                 <div class="col-sm-3 fields-oh-special-times" style="<?= ($special['status'] ?? 'closed') !== 'open' ? 'display:none' : '' ?>">
-                                    <?php foreach ($special['times'] ?? [] as $slot): ?>
-                                    <div class="form-inline">
-                                        <input type="time" class="form-control input-sm" value="<?= rex_escape($slot['open'] ?? '') ?>" />
-                                        <span> – </span>
-                                        <input type="time" class="form-control input-sm" value="<?= rex_escape($slot['close'] ?? '') ?>" />
+                                    <?php foreach (count($specialTimes) > 0 ? $specialTimes : [['open' => '09:00', 'close' => '17:00']] as $ti => $slot): ?>
+                                    <div class="fields-oh-timeslot" data-index="<?= $ti ?>">
+                                        <div class="form-inline">
+                                            <input type="time" class="form-control input-sm fields-oh-open" value="<?= rex_escape($slot['open'] ?? '09:00') ?>" />
+                                            <span> – </span>
+                                            <input type="time" class="form-control input-sm fields-oh-close" value="<?= rex_escape($slot['close'] ?? '17:00') ?>" />
+                                            <button type="button" class="btn btn-danger btn-xs fields-oh-remove-time" title="Entfernen">
+                                                <i class="rex-icon fa-minus"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                     <?php endforeach; ?>
+                                    <button type="button" class="btn btn-default btn-xs fields-oh-add-time">
+                                        <i class="rex-icon fa-plus"></i> <?= rex_i18n::msg('fields_opening_hours_add_time') ?>
+                                    </button>
                                 </div>
                                 <div class="col-sm-1">
                                     <button type="button" class="btn btn-danger btn-xs fields-oh-special-remove">
