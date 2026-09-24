@@ -1094,6 +1094,15 @@
     // Opening Hours
     // ============================================================
 
+    function timeSlotHtml() {
+        return '<div class="fields-oh-timeslot"><div class="form-inline">' +
+            '<input type="time" class="form-control input-sm fields-oh-open" value="09:00" />' +
+            '<span> – </span>' +
+            '<input type="time" class="form-control input-sm fields-oh-close" value="17:00" />' +
+            '<button type="button" class="btn btn-danger btn-xs fields-oh-remove-time" title="Entfernen">' +
+            '<i class="rex-icon fa-minus"></i></button></div></div>';
+    }
+
     function registerOpeningHoursEvents() {
         // Status change
         document.addEventListener('change', function (e) {
@@ -1111,14 +1120,7 @@
         document.addEventListener('click', function (e) {
             if (!e.target.closest('.fields-oh-add-time')) return;
             var btn = e.target.closest('.fields-oh-add-time');
-            var container = btn.closest('.fields-oh-times');
-            var html = '<div class="fields-oh-timeslot"><div class="form-inline">' +
-                '<input type="time" class="form-control input-sm fields-oh-open" value="09:00" />' +
-                '<span> – </span>' +
-                '<input type="time" class="form-control input-sm fields-oh-close" value="17:00" />' +
-                '<button type="button" class="btn btn-danger btn-xs fields-oh-remove-time" title="Entfernen">' +
-                '<i class="rex-icon fa-minus"></i></button></div></div>';
-            btn.insertAdjacentHTML('beforebegin', html);
+            btn.insertAdjacentHTML('beforebegin', timeSlotHtml());
             var wrapper = btn.closest('.fields-opening-hours');
             if (wrapper) updateOpeningHoursValue(wrapper);
         });
@@ -1142,7 +1144,9 @@
                 '<div class="col-sm-3"><input type="text" class="form-control input-sm fields-oh-special-name" placeholder="Bezeichnung" /></div>' +
                 '<div class="col-sm-2"><select class="form-control input-sm fields-oh-special-status">' +
                 '<option value="closed">Geschlossen</option><option value="open">Geöffnet</option></select></div>' +
-                '<div class="col-sm-3 fields-oh-special-times" style="display:none;"></div>' +
+                '<div class="col-sm-3 fields-oh-special-times" style="display:none;">' + timeSlotHtml() +
+                '<button type="button" class="btn btn-default btn-xs fields-oh-add-time">' +
+                '<i class="rex-icon fa-plus"></i> Zeitslot hinzufügen</button></div>' +
                 '<div class="col-sm-1"><button type="button" class="btn btn-danger btn-xs fields-oh-special-remove">' +
                 '<i class="rex-icon fa-trash"></i></button></div></div></div></div>';
             container.insertAdjacentHTML('beforeend', html);
@@ -1203,6 +1207,15 @@
                     status: status ? status.value : 'closed',
                     times: []
                 };
+                if (special.status === 'open') {
+                    entry.querySelectorAll('.fields-oh-timeslot').forEach(function (slot) {
+                        var open = slot.querySelector('.fields-oh-open');
+                        var close = slot.querySelector('.fields-oh-close');
+                        if (open && close) {
+                            special.times.push({ open: open.value, close: close.value });
+                        }
+                    });
+                }
                 data.special.push(special);
             }
         });
