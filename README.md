@@ -133,6 +133,17 @@ Mit der Feldoption **„Tags in der Listenansicht bearbeitbar“** (`list_editab
 
 ---
 
+## Verschlüsselung mit YForm Encryption
+
+Mit dem AddOn [YForm Encryption](https://github.com/FriendsOfREDAXO/yform_encryption) (ab 1.3.0) lassen sich Felder dieses AddOns verschlüsselt speichern:
+
+- **Einzelwerte:** `fields_iban`, `fields_inline`
+- **JSON-Strukturen:** `fields_table`, `fields_contacts`, `fields_social_web`, `fields_faq`, `fields_opening_hours`
+
+Im Backend werden die Werte beim Bearbeiten automatisch entschlüsselt; die Listenansicht zeigt die gewohnte Zusammenfassung (z. B. „Tabelle (3 Zeilen, 3 Spalten)“) mit Schloss-Symbol. Für `fields_iban` beim Verschlüsseln den Datenbanktyp **`text`** wählen – YForm Encryption setzt ihn beim Speichern der Feldzuordnung automatisch.
+
+> Frontend: Verschlüsselte Werte liegen in der Datenbank als `ENC:…`. Für die Ausgabe vorher entschlüsseln, z. B. mit `\FriendsOfREDAXO\YFormEncryption\Helper::getDecryptedRow($table, $id)`.
+
 ## Anwendung im Metainfo-AddOn
 
 Aktuell stellt **Fields** für das Metainfo-AddOn genau einen Feldtyp bereit: **Fields Tagging**. Damit lassen sich in Artikeln, Medien, Kategorien und Sprachen farbige Tags mit Autocomplete-Vorschlägen verwalten.
