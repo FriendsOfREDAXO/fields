@@ -93,7 +93,8 @@ class rex_yform_value_fields_iban extends rex_yform_value_abstract
                 'notice' => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_defaults_notice')],
             ],
             'description' => rex_i18n::msg('fields_iban_description'),
-            'db_type' => ['varchar(34)'],
+            // text: Platz für verschlüsselte Werte (YForm Encryption, „ENC:…“ ist deutlich länger als 34 Zeichen)
+            'db_type' => ['varchar(34)', 'text'],
             'famous' => false,
         ];
     }

@@ -1,6 +1,16 @@
 # Changelog
 
-## Unreleased
+## 1.4.4 - 2026-10-04
+
+### Added
+
+- `fields_iban`: zusätzlicher Datenbanktyp `text`. Verschlüsselte IBANs (AddOn [YForm Encryption](https://github.com/FriendsOfREDAXO/yform_encryption)) sind deutlich länger als 34 Zeichen; mit `text` bleibt die erweiterte Spalte auch dann erhalten, wenn das Feld im Tablemanager gespeichert oder die Tabelle neu aufgebaut wird. Bisher konnte YForm die Spalte wieder auf `varchar(34)` verkleinern und das Chiffrat abschneiden.
+
+### Docs
+
+- README: Abschnitt zur Verschlüsselung mit YForm Encryption (welche Feldtypen, was zu beachten ist).
+
+## 1.4.3 - 2026-09-24
 
 ### Fixed
 
