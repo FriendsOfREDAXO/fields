@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.5 - 2026-10-11
+
+### Fixed
+
+- `fields_inline_switch` im Formular: Der Schalter ist jetzt eine echte Checkbox mit `role="switch"` (optisch unverändert als Schalter). Damit ist er per Tastatur bedienbar (Tab, Leertaste), hat einen sichtbaren Fokus, wird von Screenreadern als Schalter mit Zustand angesagt, und ein Klick auf die Beschriftung schaltet um. Bisher war es ein `div` mit `onclick`, das weder Fokus noch `change`-Event hatte – `fields_conditional` mit einem Schalter als Quellfeld reagierte deshalb nicht.
+- `fields_inline_switch`: Standardwert bei neuen Datensätzen wird übernommen, Werte wie bei der YForm-Checkbox auf 0/1 normiert; Fehlermeldungen der Validierung erscheinen am Feld.
+- Schalter im Formular mit Rand und dunklerem Grün (Kontrast ≥ 3:1 für Bedienelemente); mehrere Schalter in einer `fields_structure`-Spalte stehen auf einer Linie.
+
 ## 1.4.4 - 2026-10-04
 
 ### Added

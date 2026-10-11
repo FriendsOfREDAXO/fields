@@ -726,6 +726,49 @@ body.rex-theme-dark .fields-table-editor .fields-is-header input.form-control {
     cursor: wait;
 }
 
+/* Switch im Formular: echte Checkbox (role="switch"), unsichtbar über dem Schalter – Tastatur, Fokus, Screenreader */
+.checkbox.fields-form-switch-group,
+.checkbox + .checkbox.fields-form-switch-group {
+    margin-top: 10px; /* Bootstrap zieht folgende Checkboxen um 5px hoch – Schalter in Spalten bleiben so auf einer Linie */
+}
+.fields-form-switch-group label {
+    position: relative;
+    padding-left: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+.fields-form-switch-group .fields-switch-input {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 36px;
+    height: 20px;
+    margin: -10px 0 0 0 !important;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 1;
+}
+.fields-form-switch-group .fields-switch-input:checked + .fields-form-switch {
+    background-color: #2f7d55; /* Kontrast ≥ 3:1 zu hellen Flächen */
+    box-shadow: none;
+}
+.fields-form-switch-group .fields-switch-input:checked + .fields-form-switch .fields-switch-slider {
+    left: 18px;
+}
+.fields-form-switch-group .fields-switch-input:focus-visible + .fields-form-switch {
+    outline: 2px solid #324050;
+    outline-offset: 2px;
+}
+.fields-form-switch-group .fields-switch-input:disabled + .fields-form-switch {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.fields-form-switch {
+    flex: 0 0 auto;
+    box-shadow: inset 0 0 0 1px #6b7785; /* Rand ≥ 3:1, damit der Schalter auch aus erkennbar ist */
+}
+
 /* Inline Select */
 .js-fields-inline-select,
 .js-fields-inline-select-list {
@@ -837,10 +880,12 @@ body.rex-theme-dark .fields-inline-switch .fields-switch-slider {
     background-color: rgba(255, 255, 255, 0.7);
     box-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
+body.rex-theme-dark .fields-form-switch-group .fields-switch-input:checked + .fields-form-switch,
 body.rex-theme-dark .fields-inline-switch.fields-switch-active {
     background-color: rgba(91, 181, 133, 0.8); /* #5bb585 with opacity */
     border-color: transparent;
 }
+body.rex-theme-dark .fields-form-switch-group .fields-switch-input:checked + .fields-form-switch .fields-switch-slider,
 body.rex-theme-dark .fields-inline-switch.fields-switch-active .fields-switch-slider {
     background-color: #fff;
     opacity: 1;
@@ -856,10 +901,12 @@ body.rex-theme-dark .fields-inline-switch.fields-switch-active .fields-switch-sl
         background-color: rgba(255, 255, 255, 0.7);
         box-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
+    body.rex-has-theme:not(.rex-theme-light) .fields-form-switch-group .fields-switch-input:checked + .fields-form-switch,
     body.rex-has-theme:not(.rex-theme-light) .fields-inline-switch.fields-switch-active {
         background-color: rgba(91, 181, 133, 0.8);
         border-color: transparent;
     }
+    body.rex-has-theme:not(.rex-theme-light) .fields-form-switch-group .fields-switch-input:checked + .fields-form-switch .fields-switch-slider,
     body.rex-has-theme:not(.rex-theme-light) .fields-inline-switch.fields-switch-active .fields-switch-slider {
         background-color: #fff;
         opacity: 1;
