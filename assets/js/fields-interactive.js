@@ -152,7 +152,9 @@
             // If we have Group A (Tab 1) ... content ... Group A (Tab 2) ... content ... Group B (Accordion 1)
             // The content of Tab 1 ends where Tab 2 starts OR where a completely new group/marker starts.
             
-            var content = getNextSiblingsUntil(marker, '.fields-interactive-marker');
+            // Fieldsets ohne Gruppe (schon zu Wrappern verarbeitet) und deren end_group bleiben Teil des Reiters –
+            // so lassen sich Fieldsets (z. B. als Spalten in fields_structure) innerhalb eines Reiters verwenden.
+            var content = getNextSiblingsUntil(marker, '.fields-interactive-marker:not([data-group=""])');
 
             
             if (type === 'tab') {
