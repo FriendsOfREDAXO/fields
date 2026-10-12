@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.6 - 2026-10-12
+
+### Fixed
+
+- Datensatz-Historie von YForm („ansehen“) brach mit Fehler 500 ab, sobald die Tabelle ein Inline-Feld enthielt (`fields_inline_switch`, `fields_inline`, `fields_inline_number`, `fields_inline_select`): YForm ruft `getListValue()` dort nur mit dem Wert auf, ohne Listen-Objekt – die Felder setzten `$params['list']` voraus („Call to a member function getValue() on null“). Ohne Liste zeigen sie den Wert jetzt nur lesbar an (Schalter als Ja/Nein, Auswahl als Klartext).
+
 ## 1.4.5 - 2026-10-11
 
 ### Fixed
