@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.7 - 2026-10-12
+
+### Fixed
+
+- Inline-Felder in YForm-Listen wieder bearbeitbar: Die Prüfung aus 1.4.6 erwartete ein `rex_list`-Objekt; die Tabellenliste von YForm ist aber `rex_yform_list` (keine Unterklasse). Dadurch zeigten Listen nur noch „ja/nein“ bzw. Text statt Schalter, Auswahl und Eingabe. Jetzt genügt ein Listen-Objekt mit `getValue()`; ohne Liste (Datensatz-Historie) weiterhin nur lesbar.
+
 ## 1.4.6 - 2026-10-12
 
 ### Fixed
