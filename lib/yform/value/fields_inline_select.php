@@ -95,6 +95,13 @@ class rex_yform_value_fields_inline_select extends rex_yform_value_abstract
     public static function getListValue(array $params): string
     {
         $value = (string) ($params['subject'] ?? '');
+        // Ohne Liste (z. B. Datensatz-Historie von YForm: getListValue() nur mit Wert) nur lesbar anzeigen
+        if (!isset($params['list']) || !$params['list'] instanceof rex_list) {
+            $field = $params['params']['field'] ?? [];
+            $choices = self::resolveChoices((string) ($field['choices'] ?? ''), (string) ($field['query'] ?? ''));
+
+            return rex_escape((string) ($choices[$value] ?? $value));
+        }
         /** @var rex_list $list */
         $list = $params['list'];
         $field = $params['params']['field'];

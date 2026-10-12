@@ -89,6 +89,10 @@ class rex_yform_value_fields_inline_switch extends rex_yform_value_abstract
     public static function getListValue($params)
     {
         $value = (int) $params['subject'];
+        // Ohne Liste (z. B. Datensatz-Historie von YForm: getListValue() nur mit Wert) nur lesbar anzeigen
+        if (!isset($params['list']) || !$params['list'] instanceof rex_list) {
+            return 1 === (int) ($params['subject'] ?? $params['value'] ?? 0) ? rex_i18n::msg('yes') : rex_i18n::msg('no');
+        }
         $list = $params['list'];
         $field = $params['params']['field']; 
 
