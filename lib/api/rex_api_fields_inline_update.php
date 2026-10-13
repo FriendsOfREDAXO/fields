@@ -38,9 +38,11 @@ class rex_api_fields_inline_update extends rex_api_function
         $id = rex_request('id', 'int');
         $value = rex_request('value', 'string');
 
-        // Check if User has permission to edit this table content
-        // YForm Table Permissions format: "yform[tablename]" (full table name incl. prefix)
-        if (!rex::getUser()->isAdmin() && !rex::getUser()->hasPerm('yform[' . $table . ']')) {
+        // Check if User has permission to edit this table content.
+        // YForm 5 grants table rights as complex perm "yform_manager_table_edit" (not as "yform[table]") –
+        // rex_yform_manager_table_authorization resolves it (admins always allowed), same check as the YForm data form.
+        $yformTable = \rex_yform_manager_table::get($table);
+        if (!$yformTable || !\rex_yform_manager_table_authorization::onAttribute(\rex_yform_manager_table_authorization::EDIT, $yformTable, rex::getUser())) {
             rex_response::cleanOutputBuffers();
             rex_response::sendJson(['success' => false, 'message' => 'Permission denied for table ' . $table]);
             exit;
@@ -55,8 +57,7 @@ class rex_api_fields_inline_update extends rex_api_function
              exit;
         }
 
-        $yformTable = \rex_yform_manager_table::get($table);
-        $fieldDef = $yformTable?->getValueField($field);
+        $fieldDef = $yformTable->getValueField($field);
         if (!$fieldDef) {
             rex_response::cleanOutputBuffers();
             rex_response::sendJson(['success' => false, 'message' => 'Felddefinition nicht gefunden']);
