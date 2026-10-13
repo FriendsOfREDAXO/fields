@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.8 - 2026-10-13
+
+### Fixed
+
+- Inline-Felder in YForm-Listen (`fields_inline_switch`, `fields_inline`, `fields_inline_number`, `fields_inline_select`): Speichern brach für alle Nicht-Admins mit „Permission denied for table …“ ab, obwohl sie die Tabelle bearbeiten dürfen. Die Schnittstelle prüfte das Recht `yform[tabelle]`, das es nicht gibt – YForm 5 vergibt Tabellenrechte als komplexes Recht `yform_manager_table_edit`. Jetzt prüft sie über `rex_yform_manager_table_authorization` (wie das YForm-Formular); Admins wie bisher immer, Benutzer ohne Bearbeitungsrecht für die Tabelle weiterhin nicht.
+
 ## 1.4.7 - 2026-10-12
 
 ### Fixed
