@@ -1364,8 +1364,25 @@
                 return;
             }
 
+            // Radio-Gruppe (z. B. YForm choice mit expanded=1): Wert ist der des gewählten Radios, auf alle hören.
+            // Vorher galt immer der erste Radio der Gruppe – Bedingungen auf Radio-Gruppen griffen nie.
+            var radios = null;
+            if (sourceInput.type === 'radio' && sourceInput.name) {
+                radios = Array.prototype.slice.call(ruleScope.querySelectorAll('input[type=radio]')).filter(function (radio) {
+                    return radio.name === sourceInput.name;
+                });
+            }
+
+            function currentValue() {
+                if (radios) {
+                    var checked = radios.filter(function (radio) { return radio.checked; })[0];
+                    return checked ? checked.value : '';
+                }
+                return sourceInput.type === 'checkbox' ? (sourceInput.checked ? '1' : '0') : sourceInput.value;
+            }
+
             function evaluate() {
-                var val = sourceInput.type === 'checkbox' ? (sourceInput.checked ? '1' : '0') : sourceInput.value;
+                var val = currentValue();
                 var match = false;
 
                 switch (operator) {
@@ -1435,8 +1452,10 @@
                 });
             }
 
-            sourceInput.addEventListener('change', evaluate);
-            sourceInput.addEventListener('input', evaluate);
+            (radios || [sourceInput]).forEach(function (input) {
+                input.addEventListener('change', evaluate);
+                input.addEventListener('input', evaluate);
+            });
             evaluate(); // Initial
         });
     }

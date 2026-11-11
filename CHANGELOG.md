@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.4.9 - 2026-11-11
+
+### Fixed
+
+- `fields_conditional`: Bedingungen auf **Radio-Gruppen** (z. B. YForm-Auswahl mit „expanded“) griffen nie – ausgewertet wurde immer der erste Radio-Button der Gruppe, und nur auf ihn wurde gehört. Jetzt zählt der gewählte Radio-Button, Änderungen an allen Radios der Gruppe lösen die Prüfung aus (Backend `fields-backend.js` und Frontend `conditional_frontend.js`).
+- `fields_inline_switch` in der Listenansicht: Der Schalter war ein `<div>` – nicht per Tastatur erreichbar, für Screenreader ohne Namen und Zustand. Er ist jetzt ein `<button role="switch">` mit `aria-checked` und der Feldbeschriftung als Namen; Leertaste/Enter schalten um, der Fokus ist sichtbar. Während des Speicherns `aria-busy`, bei Fehler wird der Zustand zurückgesetzt.
+- `fields_interactive` – Tabs und Akkordeons barrierefrei (WAI-ARIA Authoring Practices):
+  - Tabs mit `role="tablist"/"tab"/"tabpanel"`, `aria-selected`, `aria-controls`/`aria-labelledby` und Roving-Tabindex; Pfeiltasten, Pos1 und Ende wechseln den Tab.
+  - Akkordeon-Köpfe sind echte Buttons mit `aria-expanded`/`aria-controls`, die Inhalte Regionen mit Beschriftung; höchstens ein Bereich offen.
+  - Felder mit Fehlern werden nicht mehr versteckt: Der Tab bzw. Bereich mit einem Fehler öffnet sich beim Laden und ist markiert („enthält Fehler“); meldet der Browser beim Absenden ein ungültiges Pflichtfeld in einem verdeckten Tab/Bereich, öffnet er sich.
+  - Behoben: Ein als „aktiv“ markierter Tab und der erste Tab konnten gleichzeitig aktiv sein (`hasActive()` lieferte immer `false`).
+  - Unabhängig von Bootstrap-JS (eigene Umschaltlogik, ARIA-Zustände bleiben konsistent); `prefers-reduced-motion` wird beachtet.
+
 ## 1.4.8 - 2026-10-13
 
 ### Fixed

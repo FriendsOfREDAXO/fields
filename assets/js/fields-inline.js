@@ -211,6 +211,8 @@
 
         el.classList.add('loading');
         el.classList.toggle('fields-switch-active', newValue === 1);
+        el.setAttribute('aria-checked', newValue === 1 ? 'true' : 'false');
+        el.setAttribute('aria-busy', 'true');
 
         postInlineUpdate({
             table: table,
@@ -221,9 +223,11 @@
         })
         .then(function(json) {
             el.classList.remove('loading');
+            el.removeAttribute('aria-busy');
 
             if (!json.success) {
                 el.classList.toggle('fields-switch-active', currentValue === 1);
+                el.setAttribute('aria-checked', currentValue === 1 ? 'true' : 'false');
                 alert('Fehler: ' + (json.message || 'Speichern fehlgeschlagen'));
                 return;
             }
@@ -232,7 +236,9 @@
         })
         .catch(function(err) {
             el.classList.remove('loading');
+            el.removeAttribute('aria-busy');
             el.classList.toggle('fields-switch-active', currentValue === 1);
+            el.setAttribute('aria-checked', currentValue === 1 ? 'true' : 'false');
             console.error(err);
             alert('Netzwerkfehler');
         });
