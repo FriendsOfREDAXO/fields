@@ -725,6 +725,59 @@ body.rex-theme-dark .fields-table-editor .fields-is-header input.form-control {
     opacity: 0.7;
     cursor: wait;
 }
+/* Schalter in der Liste ist ein <button role="switch">: Browser-Stile zurücksetzen, Fokus sichtbar */
+button.fields-inline-switch {
+    appearance: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    line-height: 0;
+}
+button.fields-inline-switch:focus-visible {
+    outline: 2px solid #4b9ad9;
+    outline-offset: 2px;
+}
+
+/* Akkordeon (fields_interactive): Kopf ist ein echter Button */
+.fields-accordion-toggle {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+.fields-accordion-toggle::before {
+    content: "▸";
+    display: inline-block;
+    width: 1.2em;
+    transition: transform 0.15s ease;
+}
+.fields-accordion-toggle[aria-expanded="true"]::before {
+    transform: rotate(90deg);
+}
+.fields-accordion-toggle:focus-visible,
+.fields-container-tabs [role="tab"]:focus-visible {
+    outline: 2px solid #4b9ad9;
+    outline-offset: 2px;
+}
+/* Reiter/Bereich mit Fehlern */
+.fields-has-error,
+.fields-has-error:hover,
+.fields-has-error:focus {
+    color: #d9534f;
+}
+@media (prefers-reduced-motion: reduce) {
+    .fields-inline-switch,
+    .fields-inline-switch .fields-switch-slider,
+    .fields-accordion-toggle::before {
+        transition: none;
+    }
+}
 
 /* Switch im Formular: echte Checkbox (role="switch"), unsichtbar über dem Schalter – Tastatur, Fokus, Screenreader */
 .checkbox.fields-form-switch-group,

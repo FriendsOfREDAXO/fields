@@ -1,344 +1,320 @@
-(function() {
+(function () {
     'use strict';
 
     /**
      * Fields Interactive Logic
-     * Handles wrapping of YForm elements into Tabs, Accordions or Custom Groups
-     * based on .fields-interactive-marker elements.
+     * Wraps YForm elements into tabs, accordions or fieldsets based on .fields-interactive-marker
+     * elements (fields_interactive).
+     *
+     * Accessibility (WAI-ARIA Authoring Practices):
+     * - Tabs: role tablist/tab/tabpanel, aria-selected, aria-controls/aria-labelledby, roving
+     *   tabindex, arrow keys / Home / End switch tabs (automatic activation).
+     * - Accordions: the heading contains a real <button> with aria-expanded/aria-controls,
+     *   the panel is a region labelled by its button.
+     * - Fields with validation errors are never hidden: the tab/panel containing them is opened
+     *   on load (and marked), and when the browser reports an invalid field on submit.
      */
+
+    var uid = 0;
+    var ERROR_SELECTOR = '.has-error, .text-warning, [aria-invalid="true"]';
 
     function initFieldsContainers(scope) {
         scope = scope || document;
-        
-        // Find all markers that haven't been processed
-        // We use querySelectorAll to get a static list, but we might manipulate DOM, so be careful.
+
         var markers = scope.querySelectorAll('.fields-interactive-marker:not(.js-processed)');
         if (markers.length === 0) return;
 
-        // Group markers by 'group_id'
-        // If no group_id, treat as standalone 'fieldset' logic (auto-close previous of same type?)
-        // Actually, for simplicity, let's process linearly first.
-        
-        // Convert to Array for easier handling
-        var markersArr = Array.prototype.slice.call(markers);
-        
-        // We need to process groups together.
-        // Map: group_id -> [markers]
+        // Group markers by group_id; markers without a group are standalone fieldsets
         var groups = {};
-        
-        markersArr.forEach(function(marker) {
+        Array.prototype.slice.call(markers).forEach(function (marker) {
             var g = marker.dataset.group;
             if (g && g !== '') {
                 if (!groups[g]) groups[g] = [];
                 groups[g].push(marker);
             } else {
-                // No group? Maybe a standalone fieldset separator.
-                // We can process strictly linear here.
                 processStandalone(marker);
             }
             marker.classList.add('js-processed');
         });
 
-        // Process Groups (Tabs/Accordions)
         for (var gid in groups) {
-            if (groups.hasOwnProperty(gid)) {
+            if (Object.prototype.hasOwnProperty.call(groups, gid)) {
                 processGroup(groups[gid], gid);
             }
         }
     }
 
     function processStandalone(marker) {
-        // Just a separator? E.g. fieldset legend?
-        // Standard YForm fieldset behavior:
-        // It should wrap everything until next marker or end.
-        // Implementation: Find siblings until next marker. Wrap them.
-        
-        var type = marker.dataset.type; // fieldset
+        var type = marker.dataset.type;
         var label = marker.dataset.label;
-        
+
         if (type === 'end_group') {
-            // Just a stopper. Do nothing visually, just serves as break point.
+            // Only a break point
             marker.style.display = 'none';
             return;
         }
 
-        // Collect Content
         var content = getNextSiblingsUntil(marker, '.fields-interactive-marker, fieldset, .yform-fieldset');
-        // Stop also at standard fieldsets to avoid breaking layout
+        if (content.length === 0) return;
 
-        if (content.length > 0) {
-            // Create Wrapper
-            var wrapper = document.createElement('div');
-            wrapper.className = 'fields-interactive-fieldset';
-            if (label) {
-                var legend = document.createElement('h3'); // or legend if we use fieldset tag
-                legend.className = 'fields-interactive-legend';
-                legend.textContent = label;
-                wrapper.appendChild(legend);
-            }
-            
-            // Insert Wrapper
-            marker.parentNode.insertBefore(wrapper, marker.nextSibling);
+        var wrapper = document.createElement('div');
+        wrapper.className = 'fields-interactive-fieldset';
+        if (label) {
+            var legend = document.createElement('h3');
+            legend.className = 'fields-interactive-legend';
+            legend.textContent = label;
+            wrapper.appendChild(legend);
+        }
+        marker.parentNode.insertBefore(wrapper, marker.nextSibling);
+        content.forEach(function (el) {
+            wrapper.appendChild(el);
+        });
+    }
 
-            // Move Content
-            content.forEach(function(el) {
-                wrapper.appendChild(el);
+    function processGroup(groupMarkers, groupId) {
+        if (groupMarkers.length === 0) return;
+
+        var type = groupMarkers[0].dataset.type;
+        var items = groupMarkers.filter(function (marker) {
+            return marker.dataset.type !== 'end_group';
+        });
+
+        // Content of each item: everything up to the next grouped marker. Fieldsets without a group
+        // (already wrapped above) stay part of the item, so fieldsets can be used inside a tab.
+        var contents = items.map(function (marker) {
+            return getNextSiblingsUntil(marker, '.fields-interactive-marker:not([data-group=""])');
+        });
+
+        var container = document.createElement('div');
+        groupMarkers[0].parentNode.insertBefore(container, groupMarkers[0]);
+
+        if (type === 'tab') {
+            buildTabs(container, items, contents, groupId);
+        } else if (type === 'accordion') {
+            buildAccordion(container, items, contents, groupId);
+        } else {
+            container.className = (type === 'grid' ? 'row ' : '') + 'fields-group-' + groupId;
+            contents.forEach(function (content) {
+                content.forEach(function (el) { container.appendChild(el); });
             });
         }
     }
 
-    function processGroup(groupMarkers, groupId) {
-        // Validation: We need at least 1 tab/item.
-        if (groupMarkers.length === 0) return;
+    /* ------------------------------------------------------------------ Tabs */
 
-        var firstMarker = groupMarkers[0];
-        var type = firstMarker.dataset.type; // tab or accordion
-        var container = null;
-        var inputs = []; // List of item objects { marker, contentWrapper, label, active }
+    function buildTabs(container, items, contents, groupId) {
+        var base = 'fields-tabs-' + groupId + '-' + (++uid);
+        container.className = 'fields-container-tabs fields-group-' + groupId;
 
-        // 1. Create Main Container
-        if (type === 'tab') {
-            container = document.createElement('div');
-            container.className = 'fields-container-tabs fields-group-' + groupId;
-            // Create Nav
-            var nav = document.createElement('ul');
-            nav.className = 'nav nav-tabs'; 
-            // UIkit support? If generic:
-            // nav.className = 'fields-tabs-nav';
-            container.appendChild(nav);
-            
-            // Content Container
-            var contentBox = document.createElement('div');
-            contentBox.className = 'tab-content';
-            container.appendChild(contentBox);
-            
-            container._nav = nav;
-            container._content = contentBox;
+        var nav = document.createElement('ul');
+        nav.className = 'nav nav-tabs';
+        nav.setAttribute('role', 'tablist');
+        container.appendChild(nav);
 
-        } else if (type === 'accordion') {
-            container = document.createElement('div');
-            container.className = 'panel-group fields-group-' + groupId;
-            container.id = 'accordion-' + groupId;
+        var contentBox = document.createElement('div');
+        contentBox.className = 'tab-content';
+        container.appendChild(contentBox);
 
-        } else if (type === 'grid') {
-            container = document.createElement('div');
-            container.className = 'row fields-group-' + groupId; // Bootstrap row
-            // UIkit: container.className = 'uk-grid fields-group-' + groupId; container.setAttribute('uk-grid', '');
-            
-        } else {
-             // Fallback
-             container = document.createElement('div');
-             container.className = 'fields-group-' + groupId;
-        }
+        var tabs = [];
+        var panes = [];
 
-        // Insert container before first marker
-        firstMarker.parentNode.insertBefore(container, firstMarker);
+        items.forEach(function (marker, index) {
+            var li = document.createElement('li');
+            li.setAttribute('role', 'presentation');
 
-        // 2. Process Items
-        groupMarkers.forEach(function(marker, index) {
-            var mType = marker.dataset.type;
-            if (mType === 'end_group') {
-                // Just stop collecting.
-                // The loop continues but we don't start a new item.
-                return;
-            }
+            var tab = document.createElement('a');
+            tab.id = base + '-tab-' + index;
+            tab.href = '#' + base + '-panel-' + index;
+            tab.setAttribute('role', 'tab');
+            tab.setAttribute('aria-controls', base + '-panel-' + index);
+            tab.textContent = marker.dataset.label || '';
+            li.appendChild(tab);
+            nav.appendChild(li);
 
-            var label = marker.dataset.label;
-            var isActive = marker.dataset.active == '1'; // active from PHP
-            
-            // Collect Content
-            // We use a broader selector: Stop at ANY field marker.
-            // Why? Because markers are flat in DOM.
-            // If we have Group A (Tab 1) ... content ... Group A (Tab 2) ... content ... Group B (Accordion 1)
-            // The content of Tab 1 ends where Tab 2 starts OR where a completely new group/marker starts.
-            
-            // Fieldsets ohne Gruppe (schon zu Wrappern verarbeitet) und deren end_group bleiben Teil des Reiters –
-            // so lassen sich Fieldsets (z. B. als Spalten in fields_structure) innerhalb eines Reiters verwenden.
-            var content = getNextSiblingsUntil(marker, '.fields-interactive-marker:not([data-group=""])');
+            var pane = document.createElement('div');
+            pane.className = 'tab-pane';
+            pane.id = base + '-panel-' + index;
+            pane.setAttribute('role', 'tabpanel');
+            pane.setAttribute('aria-labelledby', tab.id);
+            contents[index].forEach(function (el) { pane.appendChild(el); });
+            contentBox.appendChild(pane);
 
-            
-            if (type === 'tab') {
-                // Add Tab Nav Item
-                var li = document.createElement('li');
-                var a = document.createElement('a');
-                a.href = '#tab-' + groupId + '-' + index;
-                a.textContent = label;
-                a.dataset.toggle = 'tab'; // Bootstrap 3
-                
-                // UIkit 3 support?
-                // If we detect UIkit:
-                // li.innerHTML = '<a href="#">' + label + '</a>';
-                
-                li.appendChild(a);
-                
-                // Content Pane
-                var pane = document.createElement('div');
-                pane.className = 'tab-pane';
-                pane.id = 'tab-' + groupId + '-' + index;
-
-                if (isActive || index === 0 && !hasActive(inputs)) {
-                    li.classList.add('active');
-                    pane.classList.add('active');
-                    // Store that we found an active one
-                }
-
-                container._nav.appendChild(li);
-                container._content.appendChild(pane);
-                
-                // Move content
-                content.forEach(function(el) { pane.appendChild(el); });
-
-                inputs.push({marker: marker, pane: pane, nav: li});
-
-                // Bootstrap 3 Click Handler (if JS not loaded)
-                a.addEventListener('click', function(e) {
-                     e.preventDefault();
-                     // Simple vanilla toggle if BS not present
-                     if (!window.jQuery || !jQuery.fn.tab) {
-                         var allLis = container._nav.querySelectorAll('li');
-                         var allPanes = container._content.querySelectorAll('.tab-pane');
-                         for(var i=0; i<allLis.length; i++) allLis[i].classList.remove('active');
-                         for(var i=0; i<allPanes.length; i++) allPanes[i].classList.remove('active');
-                         
-                         li.classList.add('active');
-                         pane.classList.add('active');
-                     } else {
-                         // Let Bootstrap handle it
-                         jQuery(this).tab('show');
-                     }
-                });
-            } 
-            else if (type === 'accordion') {
-                // Bootstrap 3 Panel
-                var panel = document.createElement('div');
-                panel.className = 'panel panel-default';
-                
-                var heading = document.createElement('div');
-                heading.className = 'panel-heading';
-                var title = document.createElement('h4');
-                title.className = 'panel-title';
-                var a = document.createElement('a');
-                a.href = '#collapse-' + groupId + '-' + index;
-                a.dataset.toggle = 'collapse';
-                a.dataset.parent = '#accordion-' + groupId;
-                a.textContent = label;
-                
-                title.appendChild(a);
-                heading.appendChild(title);
-                panel.appendChild(heading);
-                
-                var collapse = document.createElement('div');
-                collapse.className = 'panel-collapse collapse';
-                collapse.id = 'collapse-' + groupId + '-' + index;
-                if (isActive) collapse.classList.add('in'); // BS3 open class
-                
-                var body = document.createElement('div');
-                body.className = 'panel-body';
-                
-                // Move content
-                content.forEach(function(el) { body.appendChild(el); });
-                
-                collapse.appendChild(body);
-                panel.appendChild(collapse);
-                container.appendChild(panel);
-
-                // Manual Click Handler
-                // Note: If Bootstrap JS is loaded, it attaches its own listener to [data-toggle="collapse"].
-                // However, sometimes it fails if elements are created dynamically after load.
-                // We'll manage it manually to be safe, but we must prevent double-firing.
-                
-                // Remove data-toggle to prevent Bootstrap double-binding if we handle it manually?
-                // Or keep it for accessibility/styling?
-                // If we remove it, we must ensure our manual handler works.
-                a.removeAttribute('data-toggle'); 
-                
-                a.addEventListener('click', function(e) {
-                     e.preventDefault();
-                     e.stopPropagation(); // Stop bubbling to prevent other handlers?
-                     
-                     // Check if Bootstrap's collapse plugin is available
-                     if (window.jQuery && jQuery.fn.collapse) {
-                         // Check if this element is already handled by Bootstrap data-api
-                         // If we trigger it manually, we might dual-trigger.
-                         // But if title disappears, maybe the target is wrong?
-                         
-                         // Re-initialize with explicit parent for Accordion behavior
-                         var $collapse = jQuery(collapse);
-                         var $parent = jQuery(container); // The panel-group
-                         
-                         // Ensure parent logic works (Closing siblings)
-                         // We manually check for siblings to close them
-                         $parent.find('.panel-collapse.in').not($collapse).collapse('hide');
-                         $collapse.collapse('toggle');
-
-                     } else {
-                         // Vanilla Logic
-                         if (collapse.classList.contains('in')) {
-                             collapse.classList.remove('in');
-                             collapse.style.display = 'none';
-                         } else {
-                             // Close siblings (Accordion behavior)
-                             var parent = container;
-                             // We select only direct children collapses if possible, but selector is deep
-                             // Better: Select all collapse within this group container
-                             var all = parent.querySelectorAll('.panel-collapse');
-                             for(var i=0; i<all.length; i++) {
-                                 if (all[i] !== collapse) {
-                                     all[i].classList.remove('in');
-                                     all[i].style.display = 'none';
-                                 }
-                             }
-                             
-                             collapse.classList.add('in');
-                             collapse.style.display = 'block';
-                         }
-                     }
-                });
-            }
+            tabs.push(tab);
+            panes.push(pane);
         });
 
-        // 3. Update Input Active State based on definition
-        
-    }
-    
-    // Check if element is visible
-    function isVisible(el){
-        return !!( el.offsetWidth || el.offsetHeight || el.getClientRects().length );
+        function select(index, focus) {
+            tabs.forEach(function (tab, i) {
+                var active = i === index;
+                tab.setAttribute('aria-selected', active ? 'true' : 'false');
+                tab.tabIndex = active ? 0 : -1;
+                tab.parentNode.classList.toggle('active', active);
+                panes[i].classList.toggle('active', active);
+                panes[i].hidden = !active;
+            });
+            if (focus) tabs[index].focus();
+        }
+
+        tabs.forEach(function (tab, index) {
+            tab.addEventListener('click', function (e) {
+                e.preventDefault();
+                select(index, false);
+            });
+            tab.addEventListener('keydown', function (e) {
+                var target = null;
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') target = (index + 1) % tabs.length;
+                else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') target = (index - 1 + tabs.length) % tabs.length;
+                else if (e.key === 'Home') target = 0;
+                else if (e.key === 'End') target = tabs.length - 1;
+                if (target === null) return;
+                e.preventDefault();
+                select(target, true);
+            });
+        });
+
+        // Start: first tab with an error, otherwise the tab marked "active", otherwise the first
+        var start = activeIndex(items);
+        var withError = -1;
+        panes.forEach(function (pane, i) {
+            if (pane.querySelector(ERROR_SELECTOR)) {
+                markError(tabs[i]);
+                if (withError === -1) withError = i;
+            }
+        });
+        select(withError !== -1 ? withError : start, false);
+
+        // A required/invalid field in a hidden tab: open the tab so the browser can focus it
+        panes.forEach(function (pane, i) {
+            pane.addEventListener('invalid', function () {
+                if (pane.hidden) select(i, false);
+            }, true);
+        });
     }
 
-    // Helper: Check if we already have an active tab in our list
-    function hasActive(inputs) {
-        // iterate inputs logic... simplified in loop
-        return false; 
+    /* ------------------------------------------------------------- Accordion */
+
+    function buildAccordion(container, items, contents, groupId) {
+        var base = 'fields-accordion-' + groupId + '-' + (++uid);
+        container.className = 'panel-group fields-group-' + groupId;
+        container.id = base;
+
+        var buttons = [];
+        var regions = [];
+
+        items.forEach(function (marker, index) {
+            var panel = document.createElement('div');
+            panel.className = 'panel panel-default';
+
+            var heading = document.createElement('div');
+            heading.className = 'panel-heading';
+            var title = document.createElement('h4');
+            title.className = 'panel-title';
+
+            var button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'fields-accordion-toggle';
+            button.id = base + '-button-' + index;
+            button.setAttribute('aria-controls', base + '-panel-' + index);
+            button.textContent = marker.dataset.label || '';
+            title.appendChild(button);
+            heading.appendChild(title);
+            panel.appendChild(heading);
+
+            var region = document.createElement('div');
+            region.className = 'panel-collapse';
+            region.id = base + '-panel-' + index;
+            region.setAttribute('role', 'region');
+            region.setAttribute('aria-labelledby', button.id);
+
+            var body = document.createElement('div');
+            body.className = 'panel-body';
+            contents[index].forEach(function (el) { body.appendChild(el); });
+            region.appendChild(body);
+            panel.appendChild(region);
+            container.appendChild(panel);
+
+            buttons.push(button);
+            regions.push(region);
+        });
+
+        // Accordion behaviour: at most one panel open
+        function setOpen(index, open) {
+            buttons.forEach(function (button, i) {
+                var isOpen = i === index ? open : false;
+                button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                regions[i].hidden = !isOpen;
+                regions[i].classList.toggle('in', isOpen);
+            });
+        }
+
+        buttons.forEach(function (button, index) {
+            button.addEventListener('click', function () {
+                setOpen(index, button.getAttribute('aria-expanded') !== 'true');
+            });
+        });
+
+        var start = -1;
+        items.forEach(function (marker, i) {
+            if (start === -1 && marker.dataset.active === '1') start = i;
+        });
+        regions.forEach(function (region, i) {
+            if (region.querySelector(ERROR_SELECTOR)) {
+                markError(buttons[i]);
+                start = i;
+            }
+        });
+        setOpen(start, start !== -1);
+
+        regions.forEach(function (region, i) {
+            region.addEventListener('invalid', function () {
+                if (region.hidden) setOpen(i, true);
+            }, true);
+        });
     }
 
-    /**
-     * Get siblings until selector
-     */
+    /* --------------------------------------------------------------- Helpers */
+
+    /** Index of the item marked "active" (data-active="1"), otherwise 0 */
+    function activeIndex(items) {
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].dataset.active === '1') return i;
+        }
+        return 0;
+    }
+
+    /** Visible and announced hint that a tab/panel contains fields with errors */
+    function markError(control) {
+        control.classList.add('fields-has-error');
+        var hint = document.createElement('span');
+        hint.className = 'fields-error-hint';
+        hint.textContent = ' (!)';
+        hint.setAttribute('aria-hidden', 'true');
+        var sr = document.createElement('span');
+        sr.className = 'sr-only';
+        sr.textContent = ' – ' + (document.documentElement.lang === 'de' ? 'enthält Fehler' : 'contains errors');
+        control.appendChild(hint);
+        control.appendChild(sr);
+    }
+
     function getNextSiblingsUntil(elem, selector) {
         var siblings = [];
         var next = elem.nextElementSibling;
-        
         while (next) {
-            // Check if matches selector
-            if (next.matches && next.matches(selector)) {
-                break;
-            }
+            if (next.matches && next.matches(selector)) break;
             siblings.push(next);
             next = next.nextElementSibling;
         }
         return siblings;
     }
 
-    // Init Logic
-    var init = function() {
+    var init = function () {
         initFieldsContainers(document);
-        
-        // Rex Ready for AJAX
+
+        // Re-init for content loaded later (REDAXO rex:ready)
         if (window.jQuery) {
-            jQuery(document).on('rex:ready', function(e, container) {
-                 var dom = container instanceof jQuery ? container[0] : container;
-                 initFieldsContainers(dom);
+            jQuery(document).on('rex:ready', function (e, container) {
+                var dom = container instanceof jQuery ? container[0] : container;
+                initFieldsContainers(dom);
             });
         }
     };
@@ -348,5 +324,4 @@
     } else {
         init();
     }
-
 })();

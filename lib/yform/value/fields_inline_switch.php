@@ -117,26 +117,31 @@ class rex_yform_value_fields_inline_switch extends rex_yform_value_abstract
         $checked = ($value == 1) ? 'checked' : '';
         $activeClass = ($value == 1) ? 'fields-switch-active' : '';
 
-        // Switch HTML Structure 
-        // Inline styles only for dimensions/layout to prevent layout shift before CSS loads.
-        // Colors and Positions are handled by CSS via classes to ensure Dark Mode and JS State updates work.
+        // Schalter in der Liste: <button role="switch"> – per Tastatur erreichbar und bedienbar (Leertaste/Enter),
+        // Screenreader hören Name (Feldbeschriftung) und Zustand (aria-checked).
+        // Inline styles only for dimensions/layout are avoided; colors and positions come from CSS classes
+        // so Dark Mode and JS state updates work.
+        $label = rex_i18n::translate((string) ($field['label'] ?? $fieldName), false);
+
         return sprintf(
-            '<div class="fields-inline-switch %s" 
-                  data-table="%s" 
-                  data-field="%s" 
-                  data-id="%s" 
+            '<button type="button" role="switch" aria-checked="%s" aria-label="%s" class="fields-inline-switch %s"
+                  data-table="%s"
+                  data-field="%s"
+                  data-id="%s"
                   data-token="%s"
                   data-value="%s"
                   title="%s">
-                <div class="fields-switch-slider"></div>
-             </div>',
+                <span class="fields-switch-slider" aria-hidden="true"></span>
+             </button>',
+            1 === $value ? 'true' : 'false',
+            rex_escape($label),
             $activeClass,
             rex_escape($table),
             rex_escape($fieldName),
             (int) $id,
             $token,
             $value,
-            rex_i18n::msg('edit')
+            rex_escape($label)
         );
     }
 }
